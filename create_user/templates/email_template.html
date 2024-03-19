@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Email</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #007bff;
+            margin: 0;
+        }
+        .content {
+            margin-bottom: 30px;
+        }
+        .content p {
+            margin: 0 0 15px;
+            line-height: 1.6;
+            color: #444;
+        }
+        .footer {
+            text-align: left;
+            color: #666;
+            font-size: 14px;
+        }
+        .footer img {
+            display: block;
+            width: 100px;
+            margin-bottom: 10px;
+        }
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h3>Welcome, {{ name }}!</h3>
+        </div>
+        <div class="content">
+            <p>Your account has been created successfully. Here are your account details:</p>
+            <ul>
+                <li><strong>Username:</strong> {{ user_name }}</li>
+                <li><strong>Password:</strong> {{ password }}</li>
+            </ul>
+            <p>You can now log in using the provided credentials. Enjoy exploring our platform!</p>
+        </div>
+        <div class="footer">
+            <img src="C:\Users\anshu\Desktop\mv-portal\create_user\templates\logo-mini.png" alt="Company Logo">
+            <p>Thank you for choosing our service. For more information, visit <a href="https://meaningfulvision.com/">Meaningful Vision</a>.</p>
+        </div>
+    </div>
+</body>
+</html>
