@@ -13,7 +13,7 @@ from django.http import HttpResponse, JsonResponse
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SnapshotRegionExport(View):
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         try:
             data = json.loads(request.body)
             filters = data.get('filters', {})
