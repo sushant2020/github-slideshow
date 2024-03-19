@@ -26,6 +26,7 @@
         .header h1 {
             color: #007bff;
             margin: 0;
+            text-align: left;
         }
         .content {
             margin-bottom: 30px;
@@ -34,6 +35,7 @@
             margin: 0 0 15px;
             line-height: 1.6;
             color: #444;
+            text-align: left; /* Left align text */
         }
         .footer {
             text-align: left;
@@ -54,7 +56,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h3>Welcome, {{ name }}!</h3>
+            <h1>Welcome, {{ name }}!</h1>
         </div>
         <div class="content">
             <p>Your account has been created successfully. Here are your account details:</p>
@@ -65,7 +67,7 @@
             <p>You can now log in using the provided credentials. Enjoy exploring our platform!</p>
         </div>
         <div class="footer">
-            <img src="C:\Users\anshu\Desktop\mv-portal\create_user\templates\logo-mini.png" alt="Company Logo">
+            <img src="https://example.com/company_logo.png" alt="Company Logo">
             <p>Thank you for choosing our service. For more information, visit <a href="https://meaningfulvision.com/">Meaningful Vision</a>.</p>
         </div>
     </div>
