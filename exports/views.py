@@ -129,24 +129,18 @@ class SnapshotRegionExport(View):
                 cursor.execute(query, params)
                 user_data = cursor.fetchall()
 
-                if request.GET.get('format') == 'csv':
-                    csv_response = HttpResponse(content_type='text/csv')
-                    csv_response['Content-Disposition'] = 'attachment; filename="data.csv"'
+                result = []
 
-                    csv_writer = csv.writer(csv_response)
-                    csv_writer.writerow([desc[0] for desc in cursor.description])  # Write header
-                    for row in user_data:
-                        csv_writer.writerow(row)
+                
 
-                    return csv_response
-                else:
-                    keys = [desc[0] for desc in cursor.description]
-                    result = [dict(zip(keys, row)) for row in user_data]
-                    response_data = {
-                        "success": True,
-                        "data": result
-                    }
-                    return JsonResponse(response_data, status=200)
+                
+                keys = [desc[0] for desc in cursor.description]
+                result = [dict(zip(keys, row)) for row in user_data]
+                response_data = {
+                    "success": True,
+                    "data": result
+                }
+                return JsonResponse(response_data, status=200)
 
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
