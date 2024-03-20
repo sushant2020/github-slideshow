@@ -405,7 +405,7 @@ class Trends_API(View):
 
                         for (product, brand, category, PriceSegment,Size,ProteinType), prices in limited_grouped_data.items():
                             item = {
-                                "item": product,
+                                "Item": product,
                                 "Brand": brand,
                                 "Category": category,
                                 "Price_range": PriceSegment
