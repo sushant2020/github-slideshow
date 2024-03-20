@@ -76,6 +76,11 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000', 
+    "https://api-meaningfulvision.azurewebsites.net" # Add your frontend origin here
+]
 
 ROOT_URLCONF = 'backend.urls'
 

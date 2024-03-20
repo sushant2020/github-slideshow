@@ -144,3 +144,15 @@ class SnapshotRegionExport(View):
 
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
+        
+
+
+# @method_decorator(csrf_exempt, name='dispatch')
+# class SnapshotRegionExport(View): 
+#     def post(self, request, *args, **kwargs):
+#         try:
+#             data = json.loads(request.body)
+#             filters = data.get('filters', {})
+#             sort_column = data.get('sort_column')
+#             sort_type = data.get('sort_type')
+#             email = data.get("email","")
