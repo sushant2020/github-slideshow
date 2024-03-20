@@ -29,6 +29,10 @@ class EditUserAPI(View):
                 updates.append(f"FirstName = '{data['first_name']}'")
             if 'last_name' in data:
                 updates.append(f"LastName = '{data['last_name']}'")
+            if 'organization' in data:
+                updates.append(f"Organization = '{data['organization']}'")  
+            if 'phone_number' in data:
+                updates.append(f"PhoneNumber = '{data['phone_number']}'")  
                 
             if updates:
                 updates.append("updated_at = GETDATE()")  # Always update the updated_date
@@ -41,6 +45,7 @@ class EditUserAPI(View):
                         SET {update_str}
                         WHERE Email = '{data['email']}'
                     ''')
+                
                 
                 response_data = {
                     "success": True,
