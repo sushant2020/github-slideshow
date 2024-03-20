@@ -243,6 +243,25 @@ class OrganizationDropdown(View):
             return JsonResponse({'success': False, 'message': str(err)}, status=500)                
 
 
+@method_decorator(csrf_exempt, name='dispatch')
+class UserOrganizationDropdown(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            with connection.cursor() as cursor_competitive:
+                cursor_competitive.execute(
+                    "select DISTINCT Organization from MetaOrganization mo "
+                )
+                filters = cursor_competitive.fetchall()
+                result_array_competitive_set = [{"value": item[0], "label": item[0]} for item in filters]
+                response_data = {
+                    "success": "true",
+                    "Brand": result_array_competitive_set
+                }
+                return JsonResponse(response_data, status=200)
+        
+        except Exception as err:
+            return JsonResponse({'success': False, 'message': str(err)}, status=500)                
+
 
 
 @method_decorator(csrf_exempt, name='dispatch')
