@@ -86,7 +86,7 @@ class CreateUserAPI(View):
             message = f"Welcome {name}. Your account has been created. Your username is {user_name} and password is {password}."
 
 # Prepare the HTML content
-            html_message = render_to_string('email_template.html', {'name': name, 'user_name': user_name, 'password': password})
+            html_message = render_to_string('email_template2.html', {'name': name, 'email': email, 'password': password})
 
             # Send the email
             send_mail(
