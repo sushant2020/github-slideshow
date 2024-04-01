@@ -47,12 +47,12 @@ class CreateUserAPI(View):
             organization = data.get("organization", '')
             random_no = random.randint(100, 999)
             user_name = first_name+'_'+last_name+str(random_no)
-            if phone_no.startswith('0'):
-                if len(phone_no)>11:
-                    return JsonResponse({'success': False, 'message': 'Kindly enter a valid phone number'}, status=400)
-            else:
-                if len(phone_no)>10 or len(phone_no)<10:
-                    return JsonResponse({'success': False, 'message': 'Kindly enter a valid phone number'}, status=400)
+            # if phone_no.startswith('0'):
+            #     if len(phone_no)>11:
+            #         return JsonResponse({'success': False, 'message': 'Kindly enter a valid phone number'}, status=400)
+            # else:
+            #     if len(phone_no)>10 or len(phone_no)<10:
+            #         return JsonResponse({'success': False, 'message': 'Kindly enter a valid phone number'}, status=400)
 
             # Check if the username already exists
             with connection.cursor() as cursor:
