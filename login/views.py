@@ -44,7 +44,7 @@ class LoginAPI(View):
                         "success": "true",
                         "data": {
                             "token": token,
-                            "name": user_data[4]+' '+user_data[5],  # Replace with the actual column index for the name
+                            "name": user_data[3]+' '+user_data[4],  # Replace with the actual column index for the name
                             "email": email,
                             "created_at": user_data[8],  # Replace with the actual column index for the created_at
                             "roles": user_data[14].split(',')  # Assuming roles are stored as a comma-separated string
