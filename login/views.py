@@ -31,7 +31,7 @@ class LoginAPI(View):
 
             if user_data:
                 # Check if the password matches
-                if password == user_data[2]:  # Replace with the actual column index for the password
+                if password == user_data[16]:  # Replace with the actual column index for the password
                     # Create a JWT token
                     token_data = {
                         'email': email,
