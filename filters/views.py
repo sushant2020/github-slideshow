@@ -370,7 +370,7 @@ class Brand_SegmentFilterAPI(View):
             email = data.get('email', '')
             initial_load = data.get("initial_load",'')
             segments = data.get("segments",'')
-
+            
             if initial_load == 1:
                 with connection.cursor() as cursor:
         
