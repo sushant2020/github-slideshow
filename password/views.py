@@ -26,6 +26,11 @@ class UpdatetePasswordrAPI(View):
             email = data.get('email', '')
             new_password = data.get('new_password','')
             old_password = data.get('old_password','')
+            verify_password = data.get('verify_password','')
+            
+            if new_password != verify_password:
+                return JsonResponse({'success': False, 'message': "Oops! It seems the passwords you've entered don't match. Please ensure they are identical before proceeding"}, status=500)
+
             password_hash = hashlib.sha256(str(new_password).encode()).hexdigest()
             #password_query = f''' Select Password from user_management where Email ='{email}''''
             query = f'''
@@ -63,6 +68,12 @@ class ForgotPasswordAPI(View):
             data = json.loads(request.body)
             email = data.get('email', '')
             new_password = data.get('new_password','')
+
+            verify_password = data.get('verify_password','')
+            
+            if new_password != verify_password:
+                return JsonResponse({'success': False, 'message': "Oops! It seems the passwords you've entered don't match. Please ensure they are identical before proceeding"}, status=500)
+            
             password_hash = hashlib.sha256(str(new_password).encode()).hexdigest()
             query = f'''UPDATE user_management
                         SET Password = '{new_password}', PasswordHash = '{password_hash}'
