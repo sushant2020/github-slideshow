@@ -43,6 +43,7 @@ class CreateUserAPI(View):
             email = data.get('email', '')
             phone_no = data.get("phone_number", '')
             organization = data.get("organization", '')
+            country_code = data.get("country_code",'')
             random_no = random.randint(100, 999)
             user_name = first_name + '_' + last_name + str(random_no)
 
@@ -77,10 +78,10 @@ class CreateUserAPI(View):
             token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
 
             # Insert user data into the database
-            query = '''INSERT INTO user_management (Username, PasswordHash, remember_token, FirstName, LastName, Email, PhoneNumber, CreatedAt, inserted_by, updated_by, LastLogin, IsActive, Roles, Organization,Password)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, GETDATE(), 'Super Admin', '', '', 1, 'User', %s,%s);'''
+            query = '''INSERT INTO user_management (Username, PasswordHash, remember_token, FirstName, LastName, Email, PhoneNumber, CreatedAt, inserted_by, updated_by, LastLogin, IsActive, Roles, Organization,Password,Country_code)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, GETDATE(), 'Super Admin', '', '', 1, 'User', %s,%s,%s);'''
             with connection.cursor() as cursor:
-                cursor.execute(query, (user_name, password_hash, token, first_name, last_name, email, phone_no, organization,random_password))
+                cursor.execute(query, (user_name, password_hash, token, first_name, last_name, email, phone_no, organization,random_password,str(country_code)))
 
             name = data["first_name"] + ' ' + data["last_name"]
             message = f"Welcome {name}. Your account has been created. Your username is {user_name} and password is {random_password}."
