@@ -36,7 +36,7 @@ class EditUserAPI(View):
                 
             if updates:
                 updates.append("updated_at = GETDATE()")  # Always update the updated_date
-                
+                updates.append("updated_by = 'Super Admin'")
                 update_str = ', '.join(updates)
 
                 with connection.cursor() as cursor:

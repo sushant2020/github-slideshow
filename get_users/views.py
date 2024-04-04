@@ -82,3 +82,32 @@ class GetUserAPI(View):
         except Exception as e:
             # Handle other exceptions
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class GetUserProfileAPI(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            data = json.loads(request.body)
+            email = data.get("email",'')
+            with connection.cursor() as cursor: 
+                cursor.execute(f"select FirstName, LastName,PhoneNumber ,Organization ,Email  from user_management um where um.Email = '{email}'")     
+                user_detail = cursor.fetchall()
+                keys = ["First_Name", "Last_Name","Phone_number", "Organization", "Email"]
+                result = []
+
+                for row in user_detail:
+                    obj = dict(zip(keys, row))
+                    result.append(obj)
+                response_data = {
+                    "success": True,
+                    "data": result,
+                }
+            return JsonResponse(response_data, status=200)
+                
+        except Exception as e:
+
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+
+           
