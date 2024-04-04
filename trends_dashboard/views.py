@@ -807,15 +807,25 @@ class Trends_API(View):
                                     # If data for a month is missing, set variation to None
                                     # variation_key = f"variation_{prev_year_month}_{month}"
                                     # item[variation_key] = None
-                        sorted_months = [month for month in sorted_months if '22' not in month]    
-                        sorted_months.insert(0,"Brand")
-                        sorted_months.insert(1,"Category")
-                        sorted_months.insert(2,"Protein_Type")  
+                        from_date = datetime.strptime(filters["TimescalesTrend"][0].strip(), "%Y-%m-%d")
+                        to_date = datetime.strptime(filters["TimescalesTrend"][1].strip(), "%Y-%m-%d")
+
+                        # Generating a list of months between the start and end dates
+                        months_between_dates = [from_date.strftime("%b-%y")]
+                        while from_date < to_date:
+                            from_date += relativedelta(months=1)
+                            months_between_dates.append(from_date.strftime("%b-%y"))
+
+                        # Sorting the list of months and filtering out those not within the timescale trend
+                        filter_sorted_months = sorted(set(months_between_dates).intersection(all_months), key=extract_month)
+                        filter_sorted_months.insert(0, "Item")
+                        filter_sorted_months.insert(1, "Brand")
+                        filter_sorted_months.insert(2, "Category") 
                         response_data = {
                             "success": True,
                             "data": result,
                             "total_count":total_count,
-                            "months": sorted_months  # Include the sorted list of months in the response
+                            "months": filter_sorted_months  # Include the sorted list of months in the response
                         }
 
                         return JsonResponse(response_data, status=200)

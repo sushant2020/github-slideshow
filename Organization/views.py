@@ -157,7 +157,7 @@ class DeleteOrganization(View):
                         SET IsActive = 0
                         WHERE Email in {result_tuple};
                     ''' 
-                    pdb.set_trace()
+                    
                     cursor.execute(query)
 
                     response_data = {
