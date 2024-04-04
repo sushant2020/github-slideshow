@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from django.db import connection
 from password_generator import PasswordGenerator
 from django.urls import get_resolver
+import hashlib
 
 SECRET_KEY = 'The-secret-key'  # Replace with a strong, secret key
 ALGORITHM = 'HS256'
@@ -25,14 +26,21 @@ class UpdatetePasswordrAPI(View):
             email = data.get('email', '')
             new_password = data.get('new_password','')
             old_password = data.get('old_password','')
+            password_hash = hashlib.sha256(str(new_password).encode()).hexdigest()
+            #password_query = f''' Select Password from user_management where Email ='{email}''''
             query = f'''
                         UPDATE user_management
-                        SET Password = '{new_password}'
+                        SET Password = '{new_password}', PasswordHash = '{password_hash}'
                         WHERE Email = '{email}'
                         AND Password = '{old_password}';
                     ''' 
             print(query)   
             with connection.cursor() as cursor:
+                # cursor.execute(password_query)
+                # res = cursor.fetchone[0]
+                # if res == old_password:
+                #     return JsonResponse({'success': False, 'message': ""}, status=500)
+                
                 cursor.execute(query)
                 
             response_data = {
@@ -55,10 +63,11 @@ class ForgotPasswordAPI(View):
             data = json.loads(request.body)
             email = data.get('email', '')
             new_password = data.get('new_password','')
-
+            password_hash = hashlib.sha256(str(new_password).encode()).hexdigest()
             query = f'''UPDATE user_management
-                        SET Password = '{new_password}'
+                        SET Password = '{new_password}', PasswordHash = '{password_hash}'
                         WHERE Email = '{email}';
+
                     ''' 
             print(query)   
             with connection.cursor() as cursor:

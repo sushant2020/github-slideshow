@@ -9,7 +9,7 @@ import jwt
 from datetime import datetime, timedelta
 from django.db import connection
 import pdb
-
+import hashlib
 SECRET_KEY = 'Razor@0666!!!'  # Replace with a strong, secret key
 ALGORITHM = 'HS256'
 
@@ -22,16 +22,19 @@ class LoginAPI(View):
             email = data.get('email', '')
             password = data.get('password', '')
 
-            # Run a raw SQL query to check if the user exists
+            # Hash the received password using SHA-256
+            hashed_password = hashlib.sha256(password.encode()).hexdigest()
+
+            # Run a raw SQL query to check if the user exists and the password matches
             with connection.cursor() as cursor:
                 cursor.execute(
-                    f"SELECT * FROM user_management WHERE email = '{email}'"
+                    "SELECT * FROM user_management WHERE email = %s AND IsActive = 1", [email]
                 )
                 user_data = cursor.fetchone()
 
             if user_data:
-                # Check if the password matches
-                if password == user_data[2]:  # Replace with the actual column index for the password
+                # Compare the hashed password with the PasswordHash value
+                if user_data[15].lower() == hashed_password:  # Assuming PasswordHash is stored in the 3rd column
                     # Create a JWT token
                     token_data = {
                         'email': email,
@@ -41,13 +44,13 @@ class LoginAPI(View):
 
                     # Format the response JSON for successful login
                     response_data = {
-                        "success": "true",
+                        "success": True,
                         "data": {
                             "token": token,
-                            "name": user_data[4]+' '+user_data[5],  # Replace with the actual column index for the name
+                            "name": user_data[3] + ' ' + user_data[4],  # Assuming name is stored in columns 5 and 6
                             "email": email,
-                            "created_at": user_data[8],  # Replace with the actual column index for the created_at
-                            "roles": user_data[14].split(',')  # Assuming roles are stored as a comma-separated string
+                            "created_at": user_data[8],  # Assuming created_at is stored in column 9
+                            "roles": user_data[14]  # Assuming roles are stored as a comma-separated string in column 15
                         },
                         "message": "User login successful."
                     }
@@ -57,8 +60,8 @@ class LoginAPI(View):
                     # Password incorrect
                     return JsonResponse({'success': False, 'message': 'Incorrect password'}, status=401)
             else:
-                # Email doesn't exist
-                return JsonResponse({'success': False, 'message': 'Email does not exist'}, status=404)
+                # Email doesn't exist or user is inactive
+                return JsonResponse({'success': False, 'message': 'User does not exist or is inactive'}, status=404)
 
         except Exception as e:
             # Handle other exceptions

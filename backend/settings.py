@@ -61,7 +61,8 @@ INSTALLED_APPS = [
     'hello',
     'get_users',
     'edit_user',
-    'exports'
+    'exports',
+    'Product_Promo'
 ]
 
 MIDDLEWARE = [

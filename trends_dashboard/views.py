@@ -145,7 +145,6 @@ class Trends_API(View):
                         sorted_months.insert(0,"Item")
                         sorted_months.insert(1,"Brand")
                         sorted_months.insert(2,"Category")
-                        sorted_months.insert(3,"Price_range")
                         
                         total_count = len(grouped_data)
                         start_index = (page_number - 1) * records_per_page
@@ -153,12 +152,11 @@ class Trends_API(View):
                         limited_grouped_data = dict(list(grouped_data.items())[start_index:end_index])
 
                         result = []
-                        for (product, brand, category,PriceSegment,Size,ProteinType), prices in limited_grouped_data.items():
+                        for (product, brand, category,Size,ProteinType,PriceSegment), prices in limited_grouped_data.items():
                             item = {
                                 "Item": product,
                                 "Brand": brand,
                                 "Category": category,
-                                "Price_range":PriceSegment,
                                 **prices
                             }
                             result.append(item)
@@ -268,12 +266,11 @@ class Trends_API(View):
                         limited_grouped_data = dict(list(grouped_data.items())[start_index:end_index])
                         
                         result = []
-                        for (product, brand, category,PriceSegment,Size,ProteinType), prices in limited_grouped_data.items():
+                        for (product, brand, category,Size,ProteinType,PriceSegment), prices in limited_grouped_data.items():
                             item = {
                                 "Item": product,
                                 "Brand": brand,
                                 "Category": category,
-                                "Price_range":PriceSegment
                                 
                             }
                             # Calculate variations
@@ -390,7 +387,7 @@ class Trends_API(View):
                             formatted_date = row[4]
                             ProteinType = row[7]
                             grouped_data[(product, brand, category, PriceSegment,Size,ProteinType)][formatted_date] = price
-                            month = formatted_date[:7]  # Extract month-year string
+                            month = formatted_date[:6]  # Extract month-year string
                             all_months.add(month)
 
                         
@@ -403,12 +400,11 @@ class Trends_API(View):
                         limited_grouped_data = dict(list(grouped_data.items())[start_index:end_index])
                         result = []
 
-                        for (product, brand, category, PriceSegment,Size,ProteinType), prices in limited_grouped_data.items():
+                        for (product, brand, category,Size,ProteinType,PriceSegment), prices in limited_grouped_data.items():
                             item = {
                                 "Item": product,
                                 "Brand": brand,
                                 "Category": category,
-                                "Price_range": PriceSegment
                             }
 
                             prev_year_prices = defaultdict(float)
@@ -422,17 +418,30 @@ class Trends_API(View):
                                     if item not in result:
                                         result.append(item)
 
-                        sorted_months = [month for month in sorted_months if '22' not in month]
-                        sorted_months.insert(0, "Item")
-                        sorted_months.insert(1, "Brand")
-                        sorted_months.insert(2, "Category")
-                        sorted_months.insert(3, "Price_range")
+                        #sorted_months = [month for month in sorted_months if '22' not in month]
+                        
+                        
+                        #pdb.set_trace()
+                        from_date = datetime.strptime(filters["TimescalesTrend"][0].strip(), "%Y-%m-%d")
+                        to_date = datetime.strptime(filters["TimescalesTrend"][1].strip(), "%Y-%m-%d")
+
+                        # Generating a list of months between the start and end dates
+                        months_between_dates = [from_date.strftime("%b-%y")]
+                        while from_date < to_date:
+                            from_date += relativedelta(months=1)
+                            months_between_dates.append(from_date.strftime("%b-%y"))
+
+                        # Sorting the list of months and filtering out those not within the timescale trend
+                        filter_sorted_months = sorted(set(months_between_dates).intersection(all_months), key=extract_month)
+                        filter_sorted_months.insert(0, "Item")
+                        filter_sorted_months.insert(1, "Brand")
+                        filter_sorted_months.insert(2, "Category")
 
                         response_data = {
                             "success": True,
                             "data": result,
                             "total_count": total_count,
-                            "months": sorted_months  # Include the sorted list of months in the response
+                            "months": filter_sorted_months  # Include the sorted list of months in the response
                         }
 
                         return JsonResponse(response_data, status=200)       
