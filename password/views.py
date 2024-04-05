@@ -95,3 +95,24 @@ class ForgotPasswordAPI(View):
         except Exception as e:
             # Handle other exceptions
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ForgotPasswordRedirectAPI(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            # Get data from the frontend
+            data = json.loads(request.body)
+            email = data.get('email', '')
+            query = f"select * from user_management where email = '{email}' and IsActive = 1"
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                
+            response_data = {"success":True,"data":"Reset Password","message":"Redirect to reset password link"}
+
+            return JsonResponse(response_data, status=200)
+            
+
+        except Exception as e:
+            # Handle other exceptions
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)
