@@ -678,19 +678,19 @@ class ItemFilterAPI(View):
                 if category !=[]:
                     if len(segments)!=1 and len(competitive_set) !=1:
                         query = f''' 
-                            select Item from MVProduct where Category in {str(tuple(category)).replace(',','')} and Segments in {tuple(segments)} and Chain in {tuple(competitive_set)}
+                            select Distinct Item from MVProduct where Category in {str(tuple(category)).replace(',','')} and Segments in {tuple(segments)} and Chain in {tuple(competitive_set)}
                             '''
                     elif len(segments) !=1 and len(competitive_set) ==1:
                         query = f''' 
-                            select Item from MVProduct where Category in {str(tuple(category)).replace(',','')} and Segments in {tuple(segments)} and Chain in {str(tuple(competitive_set)).replace(',','')}
+                            select Distinct Item from MVProduct where Category in {str(tuple(category)).replace(',','')} and Segments in {tuple(segments)} and Chain in {str(tuple(competitive_set)).replace(',','')}
                             '''
                     elif len(segments)==1 and len(competitive_set)!=1:
                         query = f''' 
-                            select Item from MVProduct where Category in {str(tuple(category)).replace(',','')} and Segments in {str(tuple(segments)).replace(',','')} and Chain in {tuple(competitive_set)}
+                            select Distinct Item from MVProduct where Category in {str(tuple(category)).replace(',','')} and Segments in {str(tuple(segments)).replace(',','')} and Chain in {tuple(competitive_set)}
                             '''
                     elif len(segments)==1 and len(competitive_set)==1:
                         query = f''' 
-                            select Item from MVProduct where Category in {str(tuple(category)).replace(',','')} and Segments in {str(tuple(segments)).replace(',','')} and Chain in {str(tuple(competitive_set)).replace(',','')}
+                            select Distinct Item from MVProduct where Category in {str(tuple(category)).replace(',','')} and Segments in {str(tuple(segments)).replace(',','')} and Chain in {str(tuple(competitive_set)).replace(',','')}
                             '''
 
                     cursor.execute(query)
@@ -705,25 +705,24 @@ class ItemFilterAPI(View):
                 elif category ==[]:
                     if len(segments)!=1 and len(competitive_set) !=1:
                         query = f''' 
-                            select Item from MVProduct where Segments in {tuple(segments)} and Chain in {tuple(competitive_set)}
+                            select Distinct Item from MVProduct where Segments in {tuple(segments)} and Chain in {tuple(competitive_set)}
                             '''
                     elif len(segments) !=1 and len(competitive_set) ==1:
                         query = f''' 
-                            select Item from MVProduct where Segments in {tuple(segments)} and Chain in {str(tuple(competitive_set)).replace(',','')}
+                            select Distinct Item from MVProduct where Segments in {tuple(segments)} and Chain in {str(tuple(competitive_set)).replace(',','')}
                             '''
                     elif len(segments)==1 and len(competitive_set)!=1:
                         query = f''' 
-                            select Item from MVProduct where Segments in {str(tuple(segments)).replace(',','')} and Chain in {tuple(competitive_set)}
+                            select Distinct Item from MVProduct where Segments in {str(tuple(segments)).replace(',','')} and Chain in {tuple(competitive_set)}
                             '''
                     elif len(segments)==1 and len(competitive_set)==1:
                         query = f''' 
-                            select Item from MVProduct where Segments in {str(tuple(segments)).replace(',','')} and Chain in {str(tuple(competitive_set)).replace(',','')}
+                            select Distinct Item from MVProduct where Segments in {str(tuple(segments)).replace(',','')} and Chain in {str(tuple(competitive_set)).replace(',','')}
                             '''
                         
 
                     cursor.execute(query)
                     items = cursor.fetchall()
-                    pdb.set_trace()
                     result = [item[0] for item in items]
                     item_result_array = [{"value": str(item), "label": str(item)} for item in result]
                     response_data = {
