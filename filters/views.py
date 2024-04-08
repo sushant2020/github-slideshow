@@ -664,4 +664,72 @@ class Brand_SegmentFilterAPI(View):
 
             return JsonResponse({'success': False, 'message': str(e)}, status=500)     
 
+@method_decorator(csrf_exempt, name='dispatch')
+class ItemFilterAPI(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            data = json.loads(request.body)
+            email = data.get('email', '')
+            initial_load = data.get("initial_load",'')
+            segments = data.get("segments",'')
+            competitive_set = data.get("competitive_set",'')
+            category = data.get("category",'')
+            with connection.cursor() as cursor:
+                if category !=[]:
+                    if len(segments)!=1 and len(competitive_set) !=1:
+                        query = f''' 
+                            select Item from MVProduct where Category in {str(tuple(category)).replace(',','')} and Segments in {tuple(segments)} and Chain in {tuple(competitive_set)}
+                            '''
+                    elif len(segments) !=1 and len(competitive_set) ==1:
+                        query = f''' 
+                            select Item from MVProduct where Category in {str(tuple(category)).replace(',','')} and Segments in {tuple(segments)} and Chain in {str(tuple(competitive_set)).replace(',','')}
+                            '''
+                    elif len(segments)==1 and len(competitive_set)!=1:
+                        query = f''' 
+                            select Item from MVProduct where Category in {str(tuple(category)).replace(',','')} and Segments in {str(tuple(segments)).replace(',','')} and Chain in {tuple(competitive_set)}
+                            '''
+                    elif len(segments)==1 and len(competitive_set)==1:
+                        query = f''' 
+                            select Item from MVProduct where Category in {str(tuple(category)).replace(',','')} and Segments in {str(tuple(segments)).replace(',','')} and Chain in {str(tuple(competitive_set)).replace(',','')}
+                            '''
 
+                    cursor.execute(query)
+                    items = cursor.fetchall()
+                    result = [item[0] for item in items]
+                    item_result_array = [{"value": str(item), "label": str(item)} for item in result]
+                    response_data = {
+                            "success": True,
+                            "item": item_result_array,
+                        }
+                    return JsonResponse(response_data, status=200)
+                elif category ==[]:
+                    if len(segments)!=1 and len(competitive_set) !=1:
+                        query = f''' 
+                            select Item from MVProduct where Segments in {tuple(segments)} and Chain in {tuple(competitive_set)}
+                            '''
+                    elif len(segments) !=1 and len(competitive_set) ==1:
+                        query = f''' 
+                            select Item from MVProduct where Segments in {tuple(segments)} and Chain in {str(tuple(competitive_set)).replace(',','')}
+                            '''
+                    elif len(segments)==1 and len(competitive_set)!=1:
+                        query = f''' 
+                            select Item from MVProduct where Segments in {str(tuple(segments)).replace(',','')} and Chain in {tuple(competitive_set)}
+                            '''
+                    elif len(segments)==1 and len(competitive_set)==1:
+                        query = f''' 
+                            select Item from MVProduct where Segments in {str(tuple(segments)).replace(',','')} and Chain in {str(tuple(competitive_set)).replace(',','')}
+                            '''
+                        
+
+                    cursor.execute(query)
+                    items = cursor.fetchall()
+                    pdb.set_trace()
+                    result = [item[0] for item in items]
+                    item_result_array = [{"value": str(item), "label": str(item)} for item in result]
+                    response_data = {
+                            "success": True,
+                            "item": item_result_array,
+                        }
+                    return JsonResponse(response_data, status=200)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)     
