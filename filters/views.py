@@ -364,17 +364,19 @@ class CommonFilter(View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class Brand_SegmentFilterAPI(View):
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         try:
             data = json.loads(request.body)
             email = data.get('email', '')
             initial_load = data.get("initial_load",'')
             segments = data.get("segments",'')
+            competitive_set = data.get("competitive_set",'')
+            category = data.get("category",'')
             
             if initial_load == 1:
                 with connection.cursor() as cursor:
         
-
+                    #pdb.set_trace()
                     cursor.execute(f'''
                         SELECT mo.Chains
                             FROM MetaOrganization mo
@@ -391,20 +393,70 @@ class Brand_SegmentFilterAPI(View):
                         '''
                     
                     cursor.execute(query)
-
+                    
                     segment_data = cursor.fetchall()
                     result = [item[0] for item in segment_data]
                     segment_result_array = [{"value": str(item), "label": str(item)} for item in result]
                     
-        
+
+                    result_values = ', '.join(f"'{item['value']}'" for item in result_array)
+                    segment_values = ', '.join(f"'{item['value']}'" for item in segment_result_array)
+
+                    query = f'''
+                        select Distinct Category from MVProduct 
+                        where Chain in ({result_values}) 
+                        and Segments in ({segment_values})
+                    '''
+
+                    cursor.execute(query)
+                    default_category = cursor.fetchall()
+                    category_result = [item[0] for item in default_category]
+                    category_array = [{"value": str(item), "label": str(item)} for item in category_result]
+                    
+                    query = f'''
+                        select Distinct Item from MVProduct 
+                        where Chain in ({result_values}) 
+                        and Segments in ({segment_values})
+                    '''
+
+                    cursor.execute(query)
+                    default_item = cursor.fetchall()
+                    item_result = [item[0] for item in default_item]
+                    item_array = [{"value": str(item), "label": str(item)} for item in item_result]
                     response_data = {
                         "success": True,
                         "brand": result_array,
-                        "segment":segment_result_array
+                        "segment":segment_result_array,
+                        "category":category_array,
+                        "item":item_array
+
+
                     }
 
                     return JsonResponse(response_data, status=200)
             else:
+                if segments !=[] :#and category !=[] and competitive_set !=[]:
+                    with connection.cursor() as cursor:
+                        #pdb.set_trace()
+                        cursor.execute(f"select Distinct Item from MVProduct where Segments in {str(tuple(segments)).replace(',','')}")
+                        default_item = cursor.fetchall()
+                        item_result = [item[0] for item in default_item]
+                        item_array = [{"value": str(item), "label": str(item)} for item in item_result]
+                        response_data = {
+                        "success": True,
+                        "brand": competitive_set,
+                        "segment":segments,
+                        "category":category,
+                        "item":item_array
+                    }
+
+                    return JsonResponse(response_data, status=200)                
+                
+                
+                elif segments !=[]:
+                    with connection.cursor() as cursor:
+                        cursor.execute(f"select ")
+
                 with connection.cursor() as cursor:    
                     cursor.execute(f'''select DISTINCT BrandName from Brands b where Segment  in {tuple(segments)}''')
                     seg_user_data = cursor.fetchall()
