@@ -359,8 +359,51 @@ class CommonFilter(View):
         
         except Exception as err:
             return JsonResponse({'success': False, 'message': str(err)}, status=500)
-        
 
+
+@method_decorator(csrf_exempt, name='dispatch')
+class Competitive_SetAPI(View):
+ def post(self, request, *args, **kwargs):
+        try:
+            data = json.loads(request.body)
+            email = data.get('email', '')
+            segments = data.get("segments",'')
+            with connection.cursor() as cursor:
+                    cursor.execute(f'''
+                    SELECT mo.Chains
+                        FROM MetaOrganization mo
+                        JOIN user_management um ON mo.Organization = um.Organization 
+                        WHERE um.Email = '{email}'
+                    ''',
+                    )
+
+                    user_data = cursor.fetchall()
+                    user_data_list = user_data[0][0].split(',')
+                    result_array = [{"value": item, "label": item} for item in user_data_list]
+                    
+                    if len(segments)==1:
+                        cursor.execute(f'''select DISTINCT BrandName from dynamicFilterDetailed b where Segment = '{segments[0]}'
+                                       ''')
+                    else:     
+                        cursor.execute(f'''select DISTINCT BrandName from dynamicFilterDetailed b where Segment in {tuple(segments)}''')
+                    seg_user_data = cursor.fetchall()
+                    seg_user_data_list = [item[0] for item in seg_user_data] 
+
+                    main_result = []
+
+                    for i in seg_user_data_list:
+                        if i in user_data_list and i not in main_result:
+                                main_result.append(i)
+                    main_result_array = [{"value": item, "label": item} for item in main_result]
+                    response_data = {
+                    "success": True,
+                    "brand": main_result_array,
+                    }
+            return JsonResponse(response_data, status=200) 
+        except Exception as e:
+            
+
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)     
 
 @method_decorator(csrf_exempt, name='dispatch')
 class Brand_SegmentFilterAPI(View):
