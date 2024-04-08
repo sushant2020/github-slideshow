@@ -43,7 +43,7 @@ class CreateUserAPI(View):
             email = data.get('email', '')
             phone_no = data.get("phone_number", '')
             organization = data.get("organization", '')
-            country_code = "+91" #data.get("country_code",'')
+            country_code = data.get("country_code",'')
             random_no = random.randint(100, 999)
             user_name = first_name + '_' + last_name + str(random_no)
 

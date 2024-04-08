@@ -29,11 +29,11 @@ class MV_Products(View):
             filter_mappings = {
                         "Timescales": "Period",
                         "Market_Segment": "Segments",
-                        "Competitive_Set": "Brand",
+                        "Competitive_Set": "Chain",
                         "Category": "Category",
                         "Protein_Type": "ProteinType",
                         "Item":"Product",
-                        "Chain":"Brand",
+                        "Chain":"Chain",
                         "Product":"Product",
                         "ProteinType":"ProteinType",
                         "Price":"Price"

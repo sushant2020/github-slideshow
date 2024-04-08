@@ -373,25 +373,24 @@ class Brand_SegmentFilterAPI(View):
             competitive_set = data.get("competitive_set",'')
             category = data.get("category",'')
             
-            if initial_load == 1:
+            
+            if segments ==[] and category ==[] and competitive_set ==[]:
                 with connection.cursor() as cursor:
-        
-                    #pdb.set_trace()
                     cursor.execute(f'''
-                        SELECT mo.Chains
-                            FROM MetaOrganization mo
-                            JOIN user_management um ON mo.Organization = um.Organization 
-                            WHERE um.Email = '{email}'
-                        ''',
-                        )
+                    SELECT mo.Chains
+                        FROM MetaOrganization mo
+                        JOIN user_management um ON mo.Organization = um.Organization 
+                        WHERE um.Email = '{email}'
+                    ''',
+                    )
 
                     user_data = cursor.fetchall()
                     user_data_list = user_data[0][0].split(',')
                     result_array = [{"value": item, "label": item} for item in user_data_list]
                     query = f'''
-                        select DISTINCT Segment from Brands b where BrandName  in {tuple(user_data_list)}
+                        select DISTINCT Segment from dynamicFilterDetailed b where BrandName  in {tuple(user_data_list)}
                         '''
-                    
+                    #pdb.set_trace()
                     cursor.execute(query)
                     
                     segment_data = cursor.fetchall()
@@ -403,62 +402,89 @@ class Brand_SegmentFilterAPI(View):
                     segment_values = ', '.join(f"'{item['value']}'" for item in segment_result_array)
 
                     query = f'''
-                        select Distinct Category from MVProduct 
-                        where Chain in ({result_values}) 
-                        and Segments in ({segment_values})
+                        select Distinct Category from dynamicFilterDetailed 
+                        where BrandName in ({result_values}) 
+                        and Segment in ({segment_values})
                     '''
 
                     cursor.execute(query)
                     default_category = cursor.fetchall()
                     category_result = [item[0] for item in default_category]
                     category_array = [{"value": str(item), "label": str(item)} for item in category_result]
+                
+                    #pdb.set_trace()
+    
+                    response_data = {
+                    "success": True,
+                    "brand": result_array,
+                    "segment":segment_result_array,
+                    "category":category_array
+                }
+
+                return JsonResponse(response_data, status=200)                
+            
+            
+            elif segments ==[] and competitive_set !=[] and category ==[]:
+                with connection.cursor() as cursor:
+                    # cursor.execute(f'''
+                    # SELECT mo.Chains
+                    #     FROM MetaOrganization mo
+                    #     JOIN user_management um ON mo.Organization = um.Organization 
+                    #     WHERE um.Email = '{email}'
+                    # ''',
+                    # )
+
+                    # user_data = cursor.fetchall()
+                    # user_data_list = user_data[0][0].split(',')
+                    result_array = [{"value": item, "label": item} for item in competitive_set]
                     
+
+                    if len(competitive_set) ==1:
+                        query = f'''
+                            select DISTINCT Segment from dynamicFilterDetailed b where BrandName  = '{competitive_set[0]}'
+
+                            '''
+                    else:    
+                    
+                        query = f'''
+                            select DISTINCT Segment from dynamicFilterDetailed b where BrandName  in {tuple(competitive_set)}
+                            '''
+                    cursor.execute(query)
+                    
+                    segment_data = cursor.fetchall()
+                    result = [item[0] for item in segment_data]
+                    segment_result_array = [{"value": str(item), "label": str(item)} for item in result]
+                    
+
+                    result_values = ', '.join(f"'{item['value']}'" for item in result_array)
+                    segment_values = ', '.join(f"'{item['value']}'" for item in segment_result_array)
+
                     query = f'''
-                        select Distinct Item from MVProduct 
-                        where Chain in ({result_values}) 
-                        and Segments in ({segment_values})
+                        select Distinct Category from dynamicFilterDetailed 
+                        where BrandName in ({result_values}) 
+                        and Segment in ({segment_values})
                     '''
 
                     cursor.execute(query)
-                    default_item = cursor.fetchall()
-                    item_result = [item[0] for item in default_item]
-                    item_array = [{"value": str(item), "label": str(item)} for item in item_result]
+                    default_category = cursor.fetchall()
+                    category_result = [item[0] for item in default_category]
+                    category_array = [{"value": str(item), "label": str(item)} for item in category_result]
                     response_data = {
-                        "success": True,
-                        "brand": result_array,
-                        "segment":segment_result_array,
-                        "category":category_array,
-                        "item":item_array
-
-
-                    }
+                    "success": True,
+                    "brand": result_array,
+                    "segment":segment_result_array,
+                    "category":category_array}
 
                     return JsonResponse(response_data, status=200)
-            else:
-                if segments !=[] :#and category !=[] and competitive_set !=[]:
-                    with connection.cursor() as cursor:
-                        #pdb.set_trace()
-                        cursor.execute(f"select Distinct Item from MVProduct where Segments in {str(tuple(segments)).replace(',','')}")
-                        default_item = cursor.fetchall()
-                        item_result = [item[0] for item in default_item]
-                        item_array = [{"value": str(item), "label": str(item)} for item in item_result]
-                        response_data = {
-                        "success": True,
-                        "brand": competitive_set,
-                        "segment":segments,
-                        "category":category,
-                        "item":item_array
-                    }
 
-                    return JsonResponse(response_data, status=200)                
-                
-                
-                elif segments !=[]:
-                    with connection.cursor() as cursor:
-                        cursor.execute(f"select ")
+            elif segments !=[] and category ==[] and competitive_set ==[]:
 
-                with connection.cursor() as cursor:    
-                    cursor.execute(f'''select DISTINCT BrandName from Brands b where Segment  in {tuple(segments)}''')
+                with connection.cursor() as cursor:   
+                    if len(segments)==1:
+                        cursor.execute(f'''select DISTINCT BrandName from dynamicFilterDetailed b where Segment = '{segments[0]}'
+                                       ''')
+                    else:     
+                        cursor.execute(f'''select DISTINCT BrandName from dynamicFilterDetailed b where Segment in {tuple(segments)}''')
                     seg_user_data = cursor.fetchall()
                     seg_user_data_list = [item[0] for item in seg_user_data] 
                     cursor.execute(f'''
@@ -471,13 +497,168 @@ class Brand_SegmentFilterAPI(View):
                     user_data = cursor.fetchall()
                     user_data_list = user_data[0][0].split(',')
                     common_elements = [elem for elem in seg_user_data_list if elem in user_data_list]
+                    result_array = [{"value": item, "label": item} for item in common_elements]
+                    segment_result_array = [{"value": str(item), "label": str(item)} for item in segments]
+                    result_values = ', '.join(f"'{item['value']}'" for item in result_array)
+                    segment_values = ', '.join(f"'{item['value']}'" for item in segment_result_array)
+                    
+                    query = f'''
+                        select Distinct Category from dynamicFilterDetailed 
+                        where BrandName in ({result_values}) 
+                        and Segment in ({segment_values})
+                    '''
+
+                    cursor.execute(query)
+                    default_category = cursor.fetchall()
+                    category_result = [item[0] for item in default_category]
+                    category_array = [{"value": str(item), "label": str(item)} for item in category_result]
                 response_data = {
                         "success": True,
-                        "brand": common_elements
+                        "brand": result_array,
+                        "segment":segment_result_array,
+                        "category":category_array
                     }
 
                 return JsonResponse(response_data, status=200)
 
+            elif segments !=[] and competitive_set !=[] and category !=[]:
+                competitive_set_array = [{"value": item, "label": item} for item in competitive_set]
+                segments_array = [{"value": item, "label": item} for item in segments]
+                category_array = [{"value": item, "label": item} for item in category]
+                response_data = {
+                        "success": True,
+                        "brand": competitive_set_array,
+                        "segment":segments_array,
+                        "category":category_array
+                    }
+                return JsonResponse(response_data, status=200)
+            elif segments ==[] and competitive_set!=[] and category!=[]:
+                with connection.cursor() as cursor:
+                    result_array = [{"value": item, "label": item} for item in competitive_set]
+                    category_result_array = [{"value": str(item), "label": str(item)} for item in category]
+                    result_values = ', '.join(f"'{item['value']}'" for item in result_array)
+                    category_values = ', '.join(f"'{item['value']}'" for item in category_result_array)
+                    query = f'''
+                        select Distinct Segment from dynamicFilterDetailed
+                        where BrandName in ({result_values}) 
+                        and Category in ({category_values})
+                    '''
+                    cursor.execute(query)
+                    default_segment = cursor.fetchall()
+                    segment_result = [item[0] for item in default_segment]
+                    segment_array = [{"value": str(item), "label": str(item)} for item in segment_result]
+                    response_data = {
+                        "success": True,
+                        "brand": result_array,
+                        "segment":segment_array,
+                        "category":category_result_array
+                    }
+                return JsonResponse(response_data, status=200)
+    
+            elif segments !=[] and competitive_set==[] and category!=[]:
+                with connection.cursor() as cursor:
+                    result_array = [{"value": item, "label": item} for item in segments]
+                    category_result_array = [{"value": str(item), "label": str(item)} for item in category]
+                    result_values = ', '.join(f"'{item['value']}'" for item in result_array)
+                    category_values = ', '.join(f"'{item['value']}'" for item in category_result_array)
+                    query = f'''
+                        select Distinct  BrandName from dynamicFilterDetailed
+                        where Segment in ({result_values}) 
+                        and Category in ({category_values})
+                    '''
+                    cursor.execute(query)
+                    default_brand = cursor.fetchall()
+                    brand_result = [item[0] for item in default_brand]
+                    cursor.execute(f'''
+                        SELECT mo.Chains
+                            FROM MetaOrganization mo
+                            JOIN user_management um ON mo.Organization = um.Organization 
+                            WHERE um.Email = '{email}'
+                        ''',
+                        )
+
+                    user_data = cursor.fetchall()
+                    user_data_brand = user_data[0][0].split(',')
+                    common_elements = [elem for elem in brand_result if elem in user_data_brand]
+                    brand_array = [{"value": str(item), "label": str(item)} for item in common_elements]
+                    response_data = {
+                        "success": True,
+                        "brand": brand_array,
+                        "segment":result_array,
+                        "category":category_result_array
+                    }
+                    return JsonResponse(response_data, status=200)
+            elif segments !=[] and competitive_set!=[] and category==[]:
+                with connection.cursor() as cursor:
+                    result_array = [{"value": item, "label": item} for item in segments]
+                    competitive_set_result_array = [{"value": str(item), "label": str(item)} for item in competitive_set]
+                    result_values = ', '.join(f"'{item['value']}'" for item in result_array)
+                    competitive_set_values = ', '.join(f"'{item['value']}'" for item in competitive_set_result_array)
+                    query = f'''
+                        select Distinct Category from dynamicFilterDetailed
+                        where Segment in ({result_values}) 
+                        and BrandName in ({competitive_set_values})
+                    '''
+                    cursor.execute(query)
+                    default_category = cursor.fetchall()
+                    category_result = [item[0] for item in default_category]
+                    category_array = [{"value": str(item), "label": str(item)} for item in category_result]
+                    response_data = {
+                        "success": True,
+                        "brand": competitive_set_result_array,
+                        "segment":result_array,
+                        "category":category_array
+                    }
+                    return JsonResponse(response_data, status=200)
+            
+            elif segments ==[] and competitive_set ==[] and category !=[]:
+                with connection.cursor() as cursor:
+                    category_result_array = [{"value": str(item), "label": str(item)} for item in category]
+                    category_values = ', '.join(f"'{item['value']}'" for item in category_result_array)
+                    
+                    if len(category)==1:
+                        query = f"select BrandName from dynamicFilterDetailed where Category = '{category[0]}'"
+                        cursor.execute(query)
+                    else:
+                        cursor.execute(f"select BrandName from dynamicFilterDetailed where Category in {tuple(category_values)}")
+                    all_brands = cursor.fetchall()
+                    all_brand_result = [item[0] for item in all_brands]
+
+                    cursor.execute(f'''
+                    SELECT mo.Chains
+                        FROM MetaOrganization mo
+                        JOIN user_management um ON mo.Organization = um.Organization 
+                        WHERE um.Email = '{email}'
+                    ''',
+                    )
+                    user_data = cursor.fetchall()
+                    user_chain_list = user_data[0][0].split(',')
+
+                    main_brand = []
+                    for i in all_brand_result:
+                        if i in user_chain_list:
+                            if i not in main_brand:
+                                main_brand.append(i)
+
+                    brand_result_array = [{"value": str(item), "label": str(item)} for item in main_brand]
+                    brand_values = ', '.join(f"'{item['value']}'" for item in brand_result_array)
+
+                    cursor.execute(f'''
+                    select Distinct  Segment from dynamicFilterDetailed
+                    where BrandName in ({brand_values}) 
+                    and Category in ({category_values})
+                        ''')
+                    default_segment = cursor.fetchall()
+                    segment_result = [item[0] for item in default_segment]
+                    segment_array = [{"value": str(item), "label": str(item)} for item in segment_result]
+                    response_data = {
+                    "success": True,
+                    "brand": brand_result_array,
+                    "segment":segment_array,
+                    "category":category_result_array
+                    }
+
+                return JsonResponse(response_data, status=200)
         except Exception as e:
             
 
