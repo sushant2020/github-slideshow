@@ -32,11 +32,11 @@ class MV_Products(View):
                         "Competitive_Set": "Chain",
                         "Category": "Category",
                         "Protein_Type": "ProteinType",
-                        "Item":"Product",
+                        "Item":"Item",
                         "Chain":"Chain",
-                        "Product":"Product",
+                        "Product":"Item",
                         "ProteinType":"ProteinType",
-                        "Price":"Price"
+                        "Prices":"Prices"
                     }
             for filter_name, filter_values in filters.items():
                 if filter_values:
@@ -80,7 +80,7 @@ class MV_Products(View):
 
             with connection.cursor() as cursor:
                 cursor.execute(f'''
-                    SELECT Chain, Category, ProteinType, Item, Price, Picture
+                    SELECT Chain, Category, ProteinType, Item, Prices, Picture
                     FROM MVProduct 
                     {where_clause}
                     {order_by_clause}
