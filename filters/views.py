@@ -33,6 +33,7 @@ class Timescalefitler(View):
             data =json.loads(request.body)
             dashboard_type = data.get('dashboard_type')
             main_dashboard = data.get("main_dashboard")
+            email = data.get("email")
 
             if main_dashboard == 'Snapshot':
                 if dashboard_type == "Region":
@@ -45,8 +46,18 @@ class Timescalefitler(View):
                         result_array = sorted(result_array, key=custom_sort)
                     
                     with connection.cursor() as cursor:
+                        cursor.execute(f'''
+                        SELECT mo.Chains
+                            FROM MetaOrganization mo
+                            JOIN user_management um ON mo.Organization = um.Organization 
+                            WHERE um.Email = '{email}'
+                        ''',
+                        )
+
+                        user_data = cursor.fetchall()
+                        user_data_list = user_data[0][0].split(',')
                         cursor.execute(
-                            "SELECT DISTINCT Product FROM SnapshotByRegionView;"
+                            f"SELECT DISTINCT Product FROM SnapshotByRegionView where Brand in {tuple(user_data_list)};"
                         )
                         filter_item = cursor.fetchall()
                         result_item_array = [{"value": item[0], "label": item[0]} for item in filter_item]    
@@ -69,8 +80,17 @@ class Timescalefitler(View):
                         result_array = sorted(result_array, key=custom_sort)
 
                     with connection.cursor() as cursor:
+                        cursor.execute(f'''
+                        SELECT mo.Chains
+                            FROM MetaOrganization mo
+                            JOIN user_management um ON mo.Organization = um.Organization 
+                            WHERE um.Email = '{email}'
+                        ''',
+                        )
+                        user_data = cursor.fetchall()
+                        user_data_list = user_data[0][0].split(',')
                         cursor.execute(
-                            "SELECT DISTINCT Product FROM SnapshotByChannelView;"
+                            f"SELECT DISTINCT Product FROM SnapshotByChannelView where Brand in {tuple(user_data_list)};"
                         )
                         filter_item = cursor.fetchall()
                         result_item_array = [{"value": item[0], "label": item[0]} for item in filter_item]    
@@ -93,8 +113,18 @@ class Timescalefitler(View):
                         result_array = sorted(result_array, key=custom_sort)
                     
                     with connection.cursor() as cursor:
+                        cursor.execute(f'''
+                        SELECT mo.Chains
+                            FROM MetaOrganization mo
+                            JOIN user_management um ON mo.Organization = um.Organization 
+                            WHERE um.Email = '{email}'
+                        ''',
+                        )
+
+                        user_data = cursor.fetchall()
+                        user_data_list = user_data[0][0].split(',')
                         cursor.execute(
-                            "SELECT DISTINCT Product FROM SnapshotByVariation;"
+                            f"SELECT DISTINCT Product FROM SnapshotByVariation where Brand in {tuple(user_data_list)};"
                         )
                         filter_item = cursor.fetchall()
                         result_item_array = [{"value": item[0], "label": item[0]} for item in filter_item]    
@@ -117,8 +147,18 @@ class Timescalefitler(View):
                         result_array = sorted(result_array, key=custom_sort)
                     
                     with connection.cursor() as cursor:
+                        cursor.execute(f'''
+                        SELECT mo.Chains
+                            FROM MetaOrganization mo
+                            JOIN user_management um ON mo.Organization = um.Organization 
+                            WHERE um.Email = '{email}'
+                        ''',
+                        )
+
+                        user_data = cursor.fetchall()
+                        user_data_list = user_data[0][0].split(',')
                         cursor.execute(
-                            "SELECT DISTINCT Product FROM SnapshotByRegionView;"
+                            f"SELECT DISTINCT Product FROM SnapshotByRegionView where Brand in {tuple(user_data_list)};"
                         )
                         filter_item = cursor.fetchall()
                         result_item_array = [{"value": item[0], "label": item[0]} for item in filter_item]    
@@ -141,8 +181,18 @@ class Timescalefitler(View):
                         result_array = sorted(result_array, key=custom_sort)
 
                     with connection.cursor() as cursor:
+                        cursor.execute(f'''
+                        SELECT mo.Chains
+                            FROM MetaOrganization mo
+                            JOIN user_management um ON mo.Organization = um.Organization 
+                            WHERE um.Email = '{email}'
+                        ''',
+                        )
+
+                        user_data = cursor.fetchall()
+                        user_data_list = user_data[0][0].split(',')
                         cursor.execute(
-                            "SELECT DISTINCT Product FROM SnapshotByChannelView;"
+                            f"SELECT DISTINCT Product FROM SnapshotByChannelView where Brand in {tuple(user_data_list)};"
                         )
                         filter_item = cursor.fetchall()
                         result_item_array = [{"value": item[0], "label": item[0]} for item in filter_item]    
@@ -165,8 +215,18 @@ class Timescalefitler(View):
                         result_array = sorted(result_array, key=custom_sort)
                     
                     with connection.cursor() as cursor:
+                        cursor.execute(f'''
+                        SELECT mo.Chains
+                            FROM MetaOrganization mo
+                            JOIN user_management um ON mo.Organization = um.Organization 
+                            WHERE um.Email = '{email}'
+                        ''',
+                        )
+
+                        user_data = cursor.fetchall()
+                        user_data_list = user_data[0][0].split(',')
                         cursor.execute(
-                            "SELECT DISTINCT Product FROM SnapshotByVariation;"
+                            f"SELECT DISTINCT Product FROM SnapshotByVariation where Brand in {tuple(user_data_list)};"
                         )
                         filter_item = cursor.fetchall()
                         result_item_array = [{"value": item[0], "label": item[0]} for item in filter_item]    
@@ -397,7 +457,7 @@ class Competitive_SetAPI(View):
                     main_result_array = [{"value": item, "label": item} for item in main_result]
                     response_data = {
                     "success": True,
-                    "brand": main_result_array,
+                    "brand": main_result_array, 
                     }
             return JsonResponse(response_data, status=200) 
         except Exception as e:
