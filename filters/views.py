@@ -444,6 +444,13 @@ class Competitive_SetAPI(View):
                     if len(segments)==1:
                         cursor.execute(f'''select DISTINCT BrandName from dynamicFilterDetailed b where Segment = '{segments[0]}'
                                        ''')
+                    elif segments ==[]:
+                        response_data = {
+                            "success": True,
+                            "brand": result_array, 
+                            }
+                        return JsonResponse(response_data, status=200)
+                        
                     else:     
                         cursor.execute(f'''select DISTINCT BrandName from dynamicFilterDetailed b where Segment in {tuple(segments)}''')
                     seg_user_data = cursor.fetchall()
@@ -516,13 +523,20 @@ class Brand_SegmentFilterAPI(View):
                     category_array = [{"value": str(item), "label": str(item)} for item in category_result]
                 
                     #pdb.set_trace()
-    
+
+                    cursor.execute(f'''select Distinct Item from dynamicFilterDetailed
+                                   where BrandName in ({result_values})
+                                   ''')
+                    items = cursor.fetchall()
+                    item_list = [item[0] for item in items]
+                    items_array = [{"value": str(item), "label": str(item)} for item in item_list]
                     response_data = {
                     "success": True,
                     "brand": result_array,
                     "segment":segment_result_array,
-                    "category":category_array
-                }
+                    "category":category_array,
+                    "item":items_array}
+
 
                 return JsonResponse(response_data, status=200)                
             
@@ -563,7 +577,7 @@ class Brand_SegmentFilterAPI(View):
                     segment_values = ', '.join(f"'{item['value']}'" for item in segment_result_array)
 
                     query = f'''
-                        select Distinct Category from dynamicFilterDetailed 
+                        select DISTINCT Category from dynamicFilterDetailed 
                         where BrandName in ({result_values}) 
                         and Segment in ({segment_values})
                     '''
@@ -572,11 +586,22 @@ class Brand_SegmentFilterAPI(View):
                     default_category = cursor.fetchall()
                     category_result = [item[0] for item in default_category]
                     category_array = [{"value": str(item), "label": str(item)} for item in category_result]
+                    # query = f'''select Item from dynamicFilterDetailed
+                    #                where BrandName in ({result_values})
+                    #                '''
+                    #pdb.set_trace()
+                    cursor.execute(f'''select Distinct Item from dynamicFilterDetailed
+                                   where BrandName in ({result_values})
+                                   ''')
+                    items = cursor.fetchall()
+                    item_list = [item[0] for item in items]
+                    items_array = [{"value": str(item), "label": str(item)} for item in item_list]
                     response_data = {
                     "success": True,
                     "brand": result_array,
                     "segment":segment_result_array,
-                    "category":category_array}
+                    "category":category_array,
+                    "item":items_array}
 
                     return JsonResponse(response_data, status=200)
 
@@ -615,12 +640,19 @@ class Brand_SegmentFilterAPI(View):
                     default_category = cursor.fetchall()
                     category_result = [item[0] for item in default_category]
                     category_array = [{"value": str(item), "label": str(item)} for item in category_result]
-                response_data = {
-                        "success": True,
-                        "brand": result_array,
-                        "segment":segment_result_array,
-                        "category":category_array
-                    }
+                    
+                    cursor.execute(f'''select Distinct Item from dynamicFilterDetailed
+                                   where BrandName in ({result_values})
+                                   and Segment in ({segment_values})''')
+                    items = cursor.fetchall()
+                    item_list = [item[0] for item in items]
+                    items_array = [{"value": str(item), "label": str(item)} for item in item_list]
+                    response_data = {
+                    "success": True,
+                    "brand": result_array,
+                    "segment":segment_result_array,
+                    "category":category_array,
+                    "item":items_array}
 
                 return JsonResponse(response_data, status=200)
 
@@ -628,13 +660,26 @@ class Brand_SegmentFilterAPI(View):
                 competitive_set_array = [{"value": item, "label": item} for item in competitive_set]
                 segments_array = [{"value": item, "label": item} for item in segments]
                 category_array = [{"value": item, "label": item} for item in category]
-                response_data = {
-                        "success": True,
-                        "brand": competitive_set_array,
-                        "segment":segments_array,
-                        "category":category_array
-                    }
-                return JsonResponse(response_data, status=200)
+                competitive_set_values = ', '.join(f"'{item['value']}'" for item in competitive_set_array)
+                segment_values = ', '.join(f"'{item['value']}'" for item in segments_array)
+                category_value = ', '.join(f"'{item['value']}'" for item in category_array)
+                with connection.cursor() as cursor:
+                    cursor.execute(f'''select Distinct Item from dynamicFilterDetailed
+                                    where BrandName in ({competitive_set_values})
+                                    and Segment in ({segment_values})
+                                    and Category in ({category_value})
+                                        ''')
+                    items = cursor.fetchall()
+                    item_list = [item[0] for item in items]
+                    items_array = [{"value": str(item), "label": str(item)} for item in item_list]
+                    response_data = {
+                            "success": True,
+                            "brand": competitive_set_array,
+                            "segment":segments_array,
+                            "category":category_array,
+                            "item":items_array
+                        }
+                    return JsonResponse(response_data, status=200)
             elif segments ==[] and competitive_set!=[] and category!=[]:
                 with connection.cursor() as cursor:
                     result_array = [{"value": item, "label": item} for item in competitive_set]
@@ -650,12 +695,18 @@ class Brand_SegmentFilterAPI(View):
                     default_segment = cursor.fetchall()
                     segment_result = [item[0] for item in default_segment]
                     segment_array = [{"value": str(item), "label": str(item)} for item in segment_result]
+                    cursor.execute(f'''select Distinct Item from dynamicFilterDetailed
+                                   where BrandName in ({result_values})
+                                   and Category in ({category_values})''')
+                    items = cursor.fetchall()
+                    item_list = [item[0] for item in items]
+                    items_array = [{"value": str(item), "label": str(item)} for item in item_list]
                     response_data = {
-                        "success": True,
-                        "brand": result_array,
-                        "segment":segment_array,
-                        "category":category_result_array
-                    }
+                    "success": True,
+                    "brand": result_array,
+                    "segment":segment_array,
+                    "category":category_result_array,
+                    "item":items_array}
                 return JsonResponse(response_data, status=200)
     
             elif segments !=[] and competitive_set==[] and category!=[]:
@@ -684,11 +735,19 @@ class Brand_SegmentFilterAPI(View):
                     user_data_brand = user_data[0][0].split(',')
                     common_elements = [elem for elem in brand_result if elem in user_data_brand]
                     brand_array = [{"value": str(item), "label": str(item)} for item in common_elements]
+                    cursor.execute(f'''select Distinct Item from dynamicFilterDetailed
+                                   where Segment in ({result_values}) 
+                                   and Category in ({category_values})
+                                   ''')
+                    items = cursor.fetchall()
+                    item_list = [item[0] for item in items]
+                    items_array = [{"value": str(item), "label": str(item)} for item in item_list]
                     response_data = {
                         "success": True,
                         "brand": brand_array,
                         "segment":result_array,
-                        "category":category_result_array
+                        "category":category_result_array,
+                        "item":items_array
                     }
                     return JsonResponse(response_data, status=200)
             elif segments !=[] and competitive_set!=[] and category==[]:
@@ -706,11 +765,19 @@ class Brand_SegmentFilterAPI(View):
                     default_category = cursor.fetchall()
                     category_result = [item[0] for item in default_category]
                     category_array = [{"value": str(item), "label": str(item)} for item in category_result]
+                    cursor.execute(f'''select Distinct Item from dynamicFilterDetailed
+                                   where Segment in ({result_values}) 
+                                   and BrandName in ({competitive_set_values})
+                                   ''')
+                    items = cursor.fetchall()
+                    item_list = [item[0] for item in items]
+                    items_array = [{"value": str(item), "label": str(item)} for item in item_list]
                     response_data = {
                         "success": True,
                         "brand": competitive_set_result_array,
                         "segment":result_array,
-                        "category":category_array
+                        "category":category_array,
+                        "item":items_array
                     }
                     return JsonResponse(response_data, status=200)
             
@@ -754,11 +821,19 @@ class Brand_SegmentFilterAPI(View):
                     default_segment = cursor.fetchall()
                     segment_result = [item[0] for item in default_segment]
                     segment_array = [{"value": str(item), "label": str(item)} for item in segment_result]
+                    cursor.execute(f'''select Distinct Item from dynamicFilterDetailed
+                                   where BrandName in ({brand_values}) 
+                                   and Category in ({category_values})
+                                   ''')
+                    items = cursor.fetchall()
+                    item_list = [item[0] for item in items]
+                    items_array = [{"value": str(item), "label": str(item)} for item in item_list]
                     response_data = {
                     "success": True,
                     "brand": brand_result_array,
                     "segment":segment_array,
-                    "category":category_result_array
+                    "category":category_result_array,
+                    "item":items_array
                     }
 
                 return JsonResponse(response_data, status=200)
