@@ -88,9 +88,17 @@ class MV_Products(View):
                     params+ [offset, records_per_page])
 
                 user_data = cursor.fetchall()
+                
+                
+                if any(filters.values()):
+                    # Query to get total count after applying filters
+                    cursor.execute(f'SELECT COUNT(*) FROM MVProduct sbrv {where_clause}', params)
+                    total_count = cursor.fetchone()[0]
+                else:
+                    # Query to get total count without applying filters
+                    cursor.execute('SELECT COUNT(*) FROM MVProduct')
+                    total_count = cursor.fetchone()[0]
 
-                cursor.execute('SELECT COUNT(*) FROM MVProduct')
-                total_count = cursor.fetchone()[0]
 
                 keys = ['Chain', 'Category', 'ProteinType', 'Item', 'Price', 'Picture']
                 result = []

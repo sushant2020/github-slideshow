@@ -818,9 +818,8 @@ class Trends_API(View):
 
                         # Sorting the list of months and filtering out those not within the timescale trend
                         filter_sorted_months = sorted(set(months_between_dates).intersection(all_months), key=extract_month)
-                        filter_sorted_months.insert(0, "Item")
-                        filter_sorted_months.insert(1, "Brand")
-                        filter_sorted_months.insert(2, "Category") 
+                        filter_sorted_months.insert(0, "Brand")
+                        filter_sorted_months.insert(1, "Category") 
                         response_data = {
                             "success": True,
                             "data": result,
