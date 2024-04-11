@@ -91,7 +91,7 @@ class CreateUserAPI(View):
             send_mail(
                 f"Welcome {name}",
                 message,
-                "anshumankumar271123@gmail.com",
+                "mv@meaningfulvision.co.uk",
                 [data["email"]],
                 html_message=html_message,
                 fail_silently=False,
