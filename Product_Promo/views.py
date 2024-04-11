@@ -100,7 +100,7 @@ class MV_Products(View):
                     total_count = cursor.fetchone()[0]
 
 
-                keys = ['Chain', 'Category', 'ProteinType', 'Item', 'Price', 'Picture']
+                keys = ['Chain', 'Category', 'ProteinType', 'Item', 'Prices', 'Picture']
                 result = []
 
                 for row in user_data:
