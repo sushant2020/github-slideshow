@@ -99,7 +99,7 @@ class SnapshotRegionAPI(View):
 
                 user_data = cursor.fetchall()
                 keys = [
-                    "Product", "Brand","Birmingham", "Belfast", "Cardiff", "Glasgow", "Liverpool", 
+                    "Product1", "Brand","Birmingham", "Belfast", "Cardiff", "Glasgow", "Liverpool", 
                     "Leeds", "Manchester", "London", "Bristol"]
 
                 result = []
@@ -113,19 +113,19 @@ class SnapshotRegionAPI(View):
                     "total_count": total_count
                 }
 
-                if request.GET.get('format') == 'csv':
-                    # If format=csv is provided in the query parameters, return CSV response
-                    csv_response = HttpResponse(content_type='text/csv')
-                    csv_response['Content-Disposition'] = 'attachment; filename="data.csv"'
+                # if request.GET.get('format') == 'csv':
+                #     # If format=csv is provided in the query parameters, return CSV response
+                #     csv_response = HttpResponse(content_type='text/csv')
+                #     csv_response['Content-Disposition'] = 'attachment; filename="data.csv"'
     
-                    csv_writer = csv.writer(csv_response)
-                    csv_writer.writerow(keys)  # Write header
-                    for row in user_data:
-                        csv_writer.writerow(row)
+                #     csv_writer = csv.writer(csv_response)
+                #     csv_writer.writerow(keys)  # Write header
+                #     for row in user_data:
+                #         csv_writer.writerow(row)
     
-                    return csv_response
-                else:
-                    return JsonResponse(response_data, status=200)
+                #     return csv_response
+                # else:
+                return JsonResponse(response_data, status=200)
                 
         except Exception as e:
 
