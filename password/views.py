@@ -113,7 +113,7 @@ class ForgotPasswordRedirectAPI(View):
                 return JsonResponse(response_data, status=200)
             else:
                 response_data = {"success":False,"data":"Email doesn't exist","message":"Please enter correct email"}
-                return JsonResponse(response_data, status=200)
+                return JsonResponse(response_data, status=500)
 
         except Exception as e:
             # Handle other exceptions
