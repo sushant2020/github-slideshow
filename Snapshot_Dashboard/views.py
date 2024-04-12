@@ -113,127 +113,12 @@ class SnapshotRegionAPI(View):
                     "total_count": total_count
                 }
 
-                # if request.GET.get('format') == 'csv':
-                #     # If format=csv is provided in the query parameters, return CSV response
-                #     csv_response = HttpResponse(content_type='text/csv')
-                #     csv_response['Content-Disposition'] = 'attachment; filename="data.csv"'
-    
-                #     csv_writer = csv.writer(csv_response)
-                #     csv_writer.writerow(keys)  # Write header
-                #     for row in user_data:
-                #         csv_writer.writerow(row)
-    
-                #     return csv_response
-                # else:
+                
                 return JsonResponse(response_data, status=200)
                 
         except Exception as e:
 
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
-
-
-# class SnapshotRegionAPI(View):
-#     def post(self, request, *args, **kwargs):
-#         try:
-#             data = json.loads(request.body)
-#             page_number = data.get('page_number', 1)
-#             filters = data.get('filters', {})
-#             sort_column = data.get('sort_column')
-#             sort_type = data.get('sort_type')
-#             records_per_page = 20 
-
-#             offset = (page_number - 1) * records_per_page
-
-#             where_conditions = []
-#             params = []
-
-#             filter_mappings = {
-#                 "Timescale": "FormattedDate",
-#                 "Market_Segment": "Segments",
-#                 "Competitive_Set": "Brand",
-#                 "Category": "Category",
-#                 "Protein_Type": "ProteinType",
-#                 "Channel": "ChannelName",
-#                 "Item" : "Product",
-#                 "City" : "City"
-#             }
-
-#             for filter_name, filter_values in filters.items():
-#                 if filter_values:
-#                     column_name = filter_mappings.get(filter_name)
-#                     if column_name !="City":
-#                         if column_name:
-#                             where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
-#                             params.extend(filter_values)
-#                 else:
-#                     if filter_name != "City":
-#                         if filter_name in filter_mappings:
-#                             column_name = filter_mappings[filter_name]
-#                             where_conditions.append(f"{column_name} IS NOT NULL")
-
-#             where_clause = ''
-#             if where_conditions:
-#                 where_clause = 'WHERE ' + ' AND '.join(where_conditions)
-
-
-#             order_by_clause = ''
-#             if sort_column and sort_type:
-#                 order_by_clause = f"ORDER BY {sort_column} {sort_type}"
-
-#             cities = filters.get("City", [])
-#             if cities == ["All"]:
-#                 keys = [
-#                     "Product", "Brand","Birmingham", "Belfast", "Cardiff", "Glasgow", "Liverpool", 
-#                     "Leeds", "Manchester", "London", "Bristol"]
-#             else:
-#                 keys = ["Product", "Brand"]
-#                 keys.extend(cities)
-        
-#             with connection.cursor() as cursor:
-#                 if any(filters.values()):
-#                     # Query to get total count after applying filters
-#                     cursor.execute(f'SELECT COUNT(*) FROM SnapshotByRegionView sbrv {where_clause}', params)
-#                     total_count = cursor.fetchone()[0]
-#                 else:
-#                     # Query to get total count without applying filters
-#                     cursor.execute('SELECT COUNT(*) FROM SnapshotByRegionView')
-#                     total_count = cursor.fetchone()[0]
-#                 if cities == ["All"]:
-#                     select_query = "SELECT Product, Brand, Birmingham, Belfast, Cardiff, Glasgow, Liverpool, Leeds, Manchester, London, Bristol FROM SnapshotByRegionView sbrv"
-#                 else:
-#                     select_query = f"SELECT Product, Brand, {', '.join(cities)} FROM SnapshotByRegionView sbrv"
-
-#                 cursor.execute(f'''
-#                     {select_query}
-#                     {where_clause}
-#                     {order_by_clause}
-#                     OFFSET %s ROWS FETCH NEXT %s ROWS ONLY ''',
-#                     params + [offset, records_per_page])
-
-#                 user_data = cursor.fetchall()
-                
-
-#                 result = []
-
-#                 for row in user_data:
-#                     obj = dict(zip(keys, row))
-#                     result.append(obj)
-
-#                 response_data = {
-#                     "success": True,
-#                     "data": result,
-#                     "total_count": total_count
-#                 }
-
-#                 return JsonResponse(response_data, status=200)
-                
-#         except Exception as e:
-
-#             return JsonResponse({'success': False, 'message': str(e)}, status=500)
-
-
-
-
 
 
 
@@ -426,7 +311,7 @@ class SnapshotVariationAPI(View):
             
             keys = ["Product", "Brand","MinPrice", "MaxPrice", "AvgPrice", "ModePrice", "Variation"]
 
-            result = [dict(zip(keys, row)) for row in user_data]
+            result = [dict(zip(keys, row)) for row in user_data if row[-1]]
            
             
             with connection.cursor() as cursor:
