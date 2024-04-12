@@ -107,11 +107,13 @@ class ForgotPasswordRedirectAPI(View):
             query = f"select * from user_management where email = '{email}' and IsActive = 1"
             with connection.cursor() as cursor:
                 cursor.execute(query)
-                
-            response_data = {"success":True,"data":"Reset Password","message":"Redirect to reset password link"}
-
-            return JsonResponse(response_data, status=200)
-            
+                data = cursor.fetchone()
+            if data:
+                response_data = {"success":True,"data":"Reset Password","message":"Redirect to reset password link"}
+                return JsonResponse(response_data, status=200)
+            else:
+                response_data = {"success":False,"data":"Email doesn't exist","message":"Please enter correct email"}
+                return JsonResponse(response_data, status=500)
 
         except Exception as e:
             # Handle other exceptions

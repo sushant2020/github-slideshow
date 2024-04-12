@@ -37,7 +37,8 @@ urlpatterns = [
     path('get-user/',include("get_users.urls")),
     path('edit-user/',include("edit_user.urls")),
     path('exports/', include('exports.urls')),
-    path('mv-products/',include('Product_Promo.urls'))
+    path('mv-products/',include('Product_Promo.urls')),
+    path('dashboard/', include("dashboard.urls"))
 ]
 
 

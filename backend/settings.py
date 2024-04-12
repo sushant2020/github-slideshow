@@ -62,7 +62,8 @@ INSTALLED_APPS = [
     'get_users',
     'edit_user',
     'exports',
-    'Product_Promo'
+    'Product_Promo',
+    "dashboard"
 ]
 
 MIDDLEWARE = [

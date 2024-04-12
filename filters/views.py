@@ -12,14 +12,10 @@ SECRET_KEY = 'Razor@0666!!!'
 ALGORITHM = 'HS256'
 
 def custom_sort_item(item):
-    # Check if the label starts with a digit
     if item['label'][0].isdigit():
-        # If it starts with a digit, return a tuple with (0, item['label'])
-        # The tuple (0, item['label']) ensures that items starting with digits appear first
+    
         return (0, item['label'])
     else:
-        # If it doesn't start with a digit, return a tuple with (1, item['label'])
-        # The tuple (1, item['label']) ensures that items not starting with digits appear later and are sorted alphabetically
         return (1, item['label'])
 
 def custom_sort(item):
@@ -242,46 +238,40 @@ class Timescalefitler(View):
         except Exception as err:
             return JsonResponse({'success': False, 'message': str(err)}, status=500)
         
+@method_decorator(csrf_exempt, name='dispatch')
+class InitialTimescalefilter(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            data =json.loads(request.body)
+            dashboard_type = data.get('dashboard_type')
+            if dashboard_type == "Region":
+                query = '''SELECT 
+                                CONCAT(LEFT(FORMAT(MAX(CONVERT(DATE, '01-' + FormattedDate, 106)), 'MMM-yyyy'), 3), '-', RIGHT(FORMAT(MAX(CONVERT(DATE, '01-' + FormattedDate, 106)), 'yy'), 2)) AS LatestDate
+                            FROM 
+                                SnapshotByRegionView;'''
+            elif dashboard_type == "Variation":
+                query = '''SELECT 
+                                CONCAT(LEFT(FORMAT(MAX(CONVERT(DATE, '01-' + FormattedDate, 106)), 'MMM-yyyy'), 3), '-', RIGHT(FORMAT(MAX(CONVERT(DATE, '01-' + FormattedDate, 106)), 'yy'), 2)) AS LatestDate
+                            FROM 
+                                SnapshotByVariation;'''
+            else:
+                query = '''SELECT 
+                                CONCAT(LEFT(FORMAT(MAX(CONVERT(DATE, '01-' + FormattedDate, 106)), 'MMM-yyyy'), 3), '-', RIGHT(FORMAT(MAX(CONVERT(DATE, '01-' + FormattedDate, 106)), 'yy'), 2)) AS LatestDate
+                            FROM 
+                                SnapshotByChannelView;'''
+            
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                date = cursor.fetchone()[0]
+                date_array =  [{"value": date, "label": date}]
+                response_data = {
+                    "success": "true",
+                    "date": date_array
+                }
+                return JsonResponse(response_data, status=200)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)
 
-# @method_decorator(csrf_exempt, name='dispatch')
-# class TimescaleChannel(View):
-#     def get(self, request, *args, **kwargs):
-#         try:
-#             with connection.cursor() as cursor:
-#                 cursor.execute(
-#                     "SELECT DISTINCT FormattedDate FROM SnapshotByChannelView;"
-#                 )
-#                 filters = cursor.fetchall()
-#                 result_array = [{"value": item[0], "label": item[0]} for item in filters]
-
-#                 response_data = {
-#                     "success": "true",
-#                     "filters": result_array,
-#                     "message": "Filter value fetched successfully"
-#                 }
-#                 return JsonResponse(response_data, status=200)
-#         except Exception as err:
-#             return JsonResponse({'success': False, 'message': str(err)}, status=500)
-
-# @method_decorator(csrf_exempt, name='dispatch')
-# class TimescaleVariation(View):
-#     def get(self, request, *args, **kwargs):
-#         try:
-#             with connection.cursor() as cursor:
-#                 cursor.execute(
-#                     "SELECT DISTINCT FormattedDate FROM SnapshotByVariation;"
-#                 )
-#                 filters = cursor.fetchall()
-#                 result_array = [{"value": item[0], "label": item[0]} for item in filters]
-
-#                 response_data = {
-#                     "success": "true",
-#                     "filters": result_array,
-#                     "message": "Filter value fetched successfully"
-#                 }
-#                 return JsonResponse(response_data, status=200)
-#         except Exception as err:
-#             return JsonResponse({'success': False, 'message': str(err)}, status=500)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class OrganizationDropdown(View):
