@@ -525,7 +525,7 @@ class CommonFilter(View):
                     
                     response_data = {
                     "success": True,
-                    "brand": result_array,
+                    "brand": brand_result_array,
                     "segment":segment_array,
                     "category":category_array,
                     "item":items_array,
@@ -736,7 +736,7 @@ class CommonFilter(View):
                     
                     response_data = {
                     "success": True,
-                    "brand": result_array,
+                    "brand": brand_result_array,
                     "segment":segments_array,
                     "category":category_result_array,
                     "item":items_array,
