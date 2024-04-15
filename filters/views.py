@@ -743,7 +743,11 @@ class CommonFilter(View):
                 "brand": brand_result_array,
                 "segment":segment_array,
                 "category":category_result_array,
-                "item":items_array
+                "item":items_array,
+                "protein_type": result_array_protein,
+                "channel" : result_array_channel,
+                "city":result_array_city,
+                "size":size
                 }
                 return JsonResponse(response_data, status=200)
         
