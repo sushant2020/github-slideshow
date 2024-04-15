@@ -662,7 +662,7 @@ class CommonFilter(View):
                             if i not in main_brand:
                                 main_brand.append(i)
 
-                    brand_result_array = [{"value": str(item), "label": str(item)} for item in main_brand]
+                    brand_result_array = [{"value": str(item), "label": str(item)} for item in user_chain_list]
                     brand_values = ', '.join(f"'{item['value']}'" for item in brand_result_array)
 
                     cursor.execute(f'''
@@ -672,7 +672,6 @@ class CommonFilter(View):
                     default_segment = cursor.fetchall()
                     segment_result = [item[0] for item in default_segment]
                     segment_array = [{"value": str(item), "label": str(item)} for item in segment_result]
-                    
                     response_data = {
                             "success": True,
                             "brand": brand_result_array,
