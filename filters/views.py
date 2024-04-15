@@ -496,7 +496,7 @@ class CommonFilter(View):
                     user_data_list = user_data[0][0].split(',')
                     common_elements = [elem for elem in seg_user_data_list if elem in user_data_list]
                     result_array = [{"value": item, "label": item} for item in common_elements]
-                    segment_result_array = [{"value": str(item), "label": str(item)} for item in filters["Market_Segments"]]
+                    segment_result_array = [{"value": str(item), "label": str(item)} for item in filters["Market_Segment"]]
                     result_values = ', '.join(f"'{item['value']}'" for item in result_array)
                     segment_values = ', '.join(f"'{item['value']}'" for item in segment_result_array)
                     
@@ -743,7 +743,11 @@ class CommonFilter(View):
                 "brand": brand_result_array,
                 "segment":segment_array,
                 "category":category_result_array,
-                "item":items_array
+                "item":items_array,
+                "protein_type": result_array_protein,
+                "channel" : result_array_channel,
+                "city":result_array_city,
+                "size":size
                 }
                 return JsonResponse(response_data, status=200)
         
