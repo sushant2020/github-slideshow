@@ -465,6 +465,7 @@ class CommonFilter(View):
                         query = f'''
                             select DISTINCT Segment from dynamicFilterDetailed b where BrandName  in {tuple(filters["Competitive_Set"])}
                             '''
+                    
                     cursor.execute(query)
                     
                     segment_data = cursor.fetchall()
@@ -480,7 +481,7 @@ class CommonFilter(View):
                         where BrandName in ({result_values}) 
                         and Segment in ({segment_values})
                     '''
-
+               
                     cursor.execute(query)
                     default_category = cursor.fetchall()
                     category_result = [item[0] for item in default_category]
@@ -776,11 +777,15 @@ class CommonFilter(View):
                     user_data = cursor.fetchall()
                     user_data_brand = user_data[0][0].split(',')
                     common_elements = [elem for elem in brand_result if elem in user_data_brand]
+                    
                     brand_array = [{"value": str(item), "label": str(item)} for item in common_elements]
+                    brand_values = ', '.join(f"'{item['value']}'" for item in brand_array)
                     cursor.execute(f'''select Distinct Item from dynamicFilterDetailed
                                 where Segment in ({result_values}) 
                                 and Category in ({category_values})
+                                and BrandName in ({brand_values})
                                 ''')
+                    #add condition to fetch items with brand also
                     items = cursor.fetchall()
                     item_list = [item[0] for item in items]
                     items_array = [{"value": str(item), "label": str(item)} for item in item_list]
