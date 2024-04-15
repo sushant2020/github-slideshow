@@ -395,10 +395,40 @@ class CommonFilter(View):
                     items = cursor.fetchall()
                     item_list = [item[0] for item in items]
                     items_array = [{"value": str(item), "label": str(item)} for item in item_list]
+                    
+                    
+                    cursor.execute(f'''
+                    SELECT mo.Chains
+                        FROM MetaOrganization mo
+                        JOIN user_management um ON mo.Organization = um.Organization 
+                        WHERE um.Email = '{email}'
+                    ''',
+                    )
+                    user_data = cursor.fetchall()
+                    user_chain_list = user_data[0][0].split(',')
+
+                    # main_brand = []
+                    # for i in all_brand_result:
+                    #     if i in user_chain_list:
+                    #         if i not in main_brand:
+                    #             main_brand.append(i)
+
+                    brand_result_array = [{"value": str(item), "label": str(item)} for item in user_chain_list]
+                    brand_values = ', '.join(f"'{item['value']}'" for item in brand_result_array)
+
+                    cursor.execute(f'''
+                    select Distinct  Segment from dynamicFilterDetailed
+                    where BrandName in ({brand_values})
+                        ''')
+                    default_segment = cursor.fetchall()
+                    segment_result = [item[0] for item in default_segment]
+                    segment_array = [{"value": str(item), "label": str(item)} for item in segment_result]
+                    
+                    
                     response_data = {
                     "success": True,
                     "brand": result_array,
-                    "segment":segment_result_array,
+                    "segment":segment_array,
                     "category":category_array,
                     "item":items_array,
                     "protein_type": result_array_protein,
@@ -462,10 +492,41 @@ class CommonFilter(View):
                     items = cursor.fetchall()
                     item_list = [item[0] for item in items]
                     items_array = [{"value": str(item), "label": str(item)} for item in item_list]
+                    
+                    
+                    
+                    cursor.execute(f'''
+                    SELECT mo.Chains
+                        FROM MetaOrganization mo
+                        JOIN user_management um ON mo.Organization = um.Organization 
+                        WHERE um.Email = '{email}'
+                    ''',
+                    )
+                    user_data = cursor.fetchall()
+                    user_chain_list = user_data[0][0].split(',')
+
+                    # main_brand = []
+                    # for i in all_brand_result:
+                    #     if i in user_chain_list:
+                    #         if i not in main_brand:
+                    #             main_brand.append(i)
+
+                    brand_result_array = [{"value": str(item), "label": str(item)} for item in user_chain_list]
+                    brand_values = ', '.join(f"'{item['value']}'" for item in brand_result_array)
+
+                    cursor.execute(f'''
+                    select Distinct  Segment from dynamicFilterDetailed
+                    where BrandName in ({brand_values})
+                        ''')
+                    default_segment = cursor.fetchall()
+                    segment_result = [item[0] for item in default_segment]
+                    segment_array = [{"value": str(item), "label": str(item)} for item in segment_result]
+                    
+                    
                     response_data = {
                     "success": True,
                     "brand": result_array,
-                    "segment":segment_result_array,
+                    "segment":segment_array,
                     "category":category_array,
                     "item":items_array,
                     "protein_type": result_array_protein,
@@ -517,10 +578,40 @@ class CommonFilter(View):
                     items = cursor.fetchall()
                     item_list = [item[0] for item in items]
                     items_array = [{"value": str(item), "label": str(item)} for item in item_list]
+                    
+                    
+                    cursor.execute(f'''
+                    SELECT mo.Chains
+                        FROM MetaOrganization mo
+                        JOIN user_management um ON mo.Organization = um.Organization 
+                        WHERE um.Email = '{email}'
+                    ''',
+                    )
+                    user_data = cursor.fetchall()
+                    user_chain_list = user_data[0][0].split(',')
+
+                    # main_brand = []
+                    # for i in all_brand_result:
+                    #     if i in user_chain_list:
+                    #         if i not in main_brand:
+                    #             main_brand.append(i)
+
+                    brand_result_array = [{"value": str(item), "label": str(item)} for item in user_chain_list]
+                    brand_values = ', '.join(f"'{item['value']}'" for item in brand_result_array)
+
+                    cursor.execute(f'''
+                    select Distinct  Segment from dynamicFilterDetailed
+                    where BrandName in ({brand_values})
+                        ''')
+                    default_segment = cursor.fetchall()
+                    segment_result = [item[0] for item in default_segment]
+                    segment_array = [{"value": str(item), "label": str(item)} for item in segment_result]
+                    
+                    
                     response_data = {
                     "success": True,
                     "brand": result_array,
-                    "segment":segment_result_array,
+                    "segment":segment_array,
                     "category":category_array,
                     "item":items_array,
                     "protein_type": result_array_protein,
@@ -538,6 +629,14 @@ class CommonFilter(View):
                 segment_values = ', '.join(f"'{item['value']}'" for item in segments_array)
                 category_value = ', '.join(f"'{item['value']}'" for item in category_array)
                 with connection.cursor() as cursor:
+
+                    cursor.execute(f''' select Distinct BrandName from dynamicFilterDetailed where Segment in ({segment_values})''')
+                    user_brands = cursor.fetchall()
+                    
+                    
+                    user_brands_list = [item[0] for item in user_brands]
+                    
+                    user_brand_array = [{"value": item, "label": item} for item in user_brands_list]
                     cursor.execute(f'''select Distinct Item from dynamicFilterDetailed
                                     where BrandName in ({competitive_set_values})
                                     and Segment in ({segment_values})
@@ -546,10 +645,38 @@ class CommonFilter(View):
                     items = cursor.fetchall()
                     item_list = [item[0] for item in items]
                     items_array = [{"value": str(item), "label": str(item)} for item in item_list]
+                    
+                    cursor.execute(f'''
+                    SELECT mo.Chains
+                        FROM MetaOrganization mo
+                        JOIN user_management um ON mo.Organization = um.Organization 
+                        WHERE um.Email = '{email}'
+                    ''',
+                    )
+                    user_data = cursor.fetchall()
+                    user_chain_list = user_data[0][0].split(',')
+
+                    main_brand = []
+                    for i in user_brands_list:
+                        if i in user_chain_list:
+                            if i not in main_brand:
+                                main_brand.append(i)
+
+                    brand_result_array = [{"value": str(item), "label": str(item)} for item in main_brand]
+                    brand_values = ', '.join(f"'{item['value']}'" for item in brand_result_array)
+
+                    cursor.execute(f'''
+                    select Distinct  Segment from dynamicFilterDetailed
+                    where BrandName in ({brand_values})
+                        ''')
+                    default_segment = cursor.fetchall()
+                    segment_result = [item[0] for item in default_segment]
+                    segment_array = [{"value": str(item), "label": str(item)} for item in segment_result]
+                    
                     response_data = {
                             "success": True,
-                            "brand": competitive_set_array,
-                            "segment":segments_array,
+                            "brand": brand_result_array,
+                            "segment":segment_array,
                             "category":category_array,
                             "item":items_array,
                             "protein_type": result_array_protein,
@@ -578,10 +705,39 @@ class CommonFilter(View):
                     items = cursor.fetchall()
                     item_list = [item[0] for item in items]
                     items_array = [{"value": str(item), "label": str(item)} for item in item_list]
+                    
+                    
+                    cursor.execute(f'''
+                    SELECT mo.Chains
+                        FROM MetaOrganization mo
+                        JOIN user_management um ON mo.Organization = um.Organization 
+                        WHERE um.Email = '{email}'
+                    ''',
+                    )
+                    user_data = cursor.fetchall()
+                    user_chain_list = user_data[0][0].split(',')
+
+                    # main_brand = []
+                    # for i in all_brand_result:
+                    #     if i in user_chain_list:
+                    #         if i not in main_brand:
+                    #             main_brand.append(i)
+
+                    brand_result_array = [{"value": str(item), "label": str(item)} for item in user_chain_list]
+                    brand_values = ', '.join(f"'{item['value']}'" for item in brand_result_array)
+
+                    cursor.execute(f'''
+                    select Distinct  Segment from dynamicFilterDetailed
+                    where BrandName in ({brand_values})
+                        ''')
+                    default_segment = cursor.fetchall()
+                    segment_result = [item[0] for item in default_segment]
+                    segments_array = [{"value": str(item), "label": str(item)} for item in segment_result]
+                    
                     response_data = {
                     "success": True,
                     "brand": result_array,
-                    "segment":segment_array,
+                    "segment":segments_array,
                     "category":category_result_array,
                     "item":items_array,
                     "protein_type": result_array_protein,
@@ -623,10 +779,40 @@ class CommonFilter(View):
                     items = cursor.fetchall()
                     item_list = [item[0] for item in items]
                     items_array = [{"value": str(item), "label": str(item)} for item in item_list]
+                    
+                    
+                    cursor.execute(f'''
+                    SELECT mo.Chains
+                        FROM MetaOrganization mo
+                        JOIN user_management um ON mo.Organization = um.Organization 
+                        WHERE um.Email = '{email}'
+                    ''',
+                    )
+                    user_data = cursor.fetchall()
+                    user_chain_list = user_data[0][0].split(',')
+
+                    # main_brand = []
+                    # for i in all_brand_result:
+                    #     if i in user_chain_list:
+                    #         if i not in main_brand:
+                    #             main_brand.append(i)
+
+                    brand_result_array = [{"value": str(item), "label": str(item)} for item in user_chain_list]
+                    brand_values = ', '.join(f"'{item['value']}'" for item in brand_result_array)
+
+                    cursor.execute(f'''
+                    select Distinct  Segment from dynamicFilterDetailed
+                    where BrandName in ({brand_values})
+                        ''')
+                    default_segment = cursor.fetchall()
+                    segment_result = [item[0] for item in default_segment]
+                    segment_array = [{"value": str(item), "label": str(item)} for item in segment_result]
+                    
+                    
                     response_data = {
                         "success": True,
                         "brand": brand_array,
-                        "segment":result_array,
+                        "segment":segment_array,
                         "category":category_result_array,
                         "item":items_array,
                         "protein_type": result_array_protein,
@@ -677,10 +863,40 @@ class CommonFilter(View):
                     common_elements = [elem for elem in brand_result if elem in user_data_brand]
                     brand_array = [{"value": str(item), "label": str(item)} for item in common_elements]
                     
+
+
+                    cursor.execute(f'''
+                    SELECT mo.Chains
+                        FROM MetaOrganization mo
+                        JOIN user_management um ON mo.Organization = um.Organization 
+                        WHERE um.Email = '{email}'
+                    ''',
+                    )
+                    user_data = cursor.fetchall()
+                    user_chain_list = user_data[0][0].split(',')
+
+                    # main_brand = []
+                    # for i in all_brand_result:
+                    #     if i in user_chain_list:
+                    #         if i not in main_brand:
+                    #             main_brand.append(i)
+
+                    brand_result_array = [{"value": str(item), "label": str(item)} for item in user_chain_list]
+                    brand_values = ', '.join(f"'{item['value']}'" for item in brand_result_array)
+
+                    cursor.execute(f'''
+                    select Distinct  Segment from dynamicFilterDetailed
+                    where BrandName in ({brand_values})
+                        ''')
+                    default_segment = cursor.fetchall()
+                    segment_result = [item[0] for item in default_segment]
+                    segment_array = [{"value": str(item), "label": str(item)} for item in segment_result]
+
+
                     response_data = {
                         "success": True,
                         "brand": brand_array,
-                        "segment":result_array,
+                        "segment":segment_array,
                         "category":category_array,
                         "item":items_array,
                         "protein_type": result_array_protein,
@@ -738,10 +954,40 @@ class CommonFilter(View):
                     items = cursor.fetchall()
                     item_list = [item[0] for item in items]
                     items_array = [{"value": str(item), "label": str(item)} for item in item_list]
+                
+                
+                    cursor.execute(f'''
+                    SELECT mo.Chains
+                        FROM MetaOrganization mo
+                        JOIN user_management um ON mo.Organization = um.Organization 
+                        WHERE um.Email = '{email}'
+                    ''',
+                    )
+                    user_data = cursor.fetchall()
+                    user_chain_list = user_data[0][0].split(',')
+
+                    # main_brand = []
+                    # for i in all_brand_result:
+                    #     if i in user_chain_list:
+                    #         if i not in main_brand:
+                    #             main_brand.append(i)
+
+                    brand_result_array = [{"value": str(item), "label": str(item)} for item in user_chain_list]
+                    brand_values = ', '.join(f"'{item['value']}'" for item in brand_result_array)
+
+                    cursor.execute(f'''
+                    select Distinct  Segment from dynamicFilterDetailed
+                    where BrandName in ({brand_values})
+                        ''')
+                    default_segment = cursor.fetchall()
+                    segment_result = [item[0] for item in default_segment]
+                    segments_array = [{"value": str(item), "label": str(item)} for item in segment_result]
+                
+                
                 response_data = {
                 "success": True,
                 "brand": brand_result_array,
-                "segment":segment_array,
+                "segment":segments_array,
                 "category":category_result_array,
                 "item":items_array,
                 "protein_type": result_array_protein,
