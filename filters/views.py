@@ -733,12 +733,17 @@ class CommonFilter(View):
                     default_segment = cursor.fetchall()
                     segment_result = [item[0] for item in default_segment]
                     segments_array = [{"value": str(item), "label": str(item)} for item in segment_result]
-                    
+                    cursor.execute(f'''select Distinct Category from dynamicFilterDetailed
+                                where BrandName in ({result_values})
+                                ''')
+                    categories = cursor.fetchall()
+                    categories_list = [item[0] for item in categories]
+                    categories_array = [{"value": str(item), "label": str(item)} for item in categories_list]
                     response_data = {
                     "success": True,
                     "brand": brand_result_array,
                     "segment":segments_array,
-                    "category":category_result_array,
+                    "category":categories_array,
                     "item":items_array,
                     "protein_type": result_array_protein,
                     "channel" : result_array_channel,
