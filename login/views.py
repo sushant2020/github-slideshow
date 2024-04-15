@@ -31,10 +31,11 @@ class LoginAPI(View):
                     "SELECT * FROM user_management WHERE email = %s AND IsActive = 1", [email]
                 )
                 user_data = cursor.fetchone()
-
+            
+            
             if user_data:
                 # Compare the hashed password with the PasswordHash value
-                if user_data[15].lower() == hashed_password:  # Assuming PasswordHash is stored in the 3rd column
+                if user_data[16] == password:  # Assuming PasswordHash is stored in the 3rd column
                     # Create a JWT token
                     token_data = {
                         'email': email,
