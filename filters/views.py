@@ -592,7 +592,7 @@ class CommonFilter(View):
                     "size":size}
                 return JsonResponse(response_data, status=200)
     
-            elif filters["Market_Segment"] !=[] and filters["Competitive_Set"]==[] and filters["Category"]==[]:
+            elif filters["Market_Segment"] !=[] and filters["Competitive_Set"]==[] and filters["Category"]!=[]:
                 with connection.cursor() as cursor:
                     result_array = [{"value": item, "label": item} for item in filters["Market_Segment"]]
                     category_result_array = [{"value": str(item), "label": str(item)} for item in filters["Category"]]
@@ -659,9 +659,29 @@ class CommonFilter(View):
                     items = cursor.fetchall()
                     item_list = [item[0] for item in items]
                     items_array = [{"value": str(item), "label": str(item)} for item in item_list]
+                    query = f'''
+                        select Distinct  BrandName from dynamicFilterDetailed
+                        where Segment in ({result_values}) 
+                    '''
+                    cursor.execute(query)
+                    default_brand = cursor.fetchall()
+                    brand_result = [item[0] for item in default_brand]
+                    cursor.execute(f'''
+                        SELECT mo.Chains
+                            FROM MetaOrganization mo
+                            JOIN user_management um ON mo.Organization = um.Organization 
+                            WHERE um.Email = '{email}'
+                        ''',
+                        )
+
+                    user_data = cursor.fetchall()
+                    user_data_brand = user_data[0][0].split(',')
+                    common_elements = [elem for elem in brand_result if elem in user_data_brand]
+                    brand_array = [{"value": str(item), "label": str(item)} for item in common_elements]
+                    
                     response_data = {
                         "success": True,
-                        "brand": competitive_set_result_array,
+                        "brand": brand_array,
                         "segment":result_array,
                         "category":category_array,
                         "item":items_array,
