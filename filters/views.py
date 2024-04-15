@@ -351,7 +351,6 @@ class CommonFilter(View):
                 size = cursor_city.fetchall()
                 size = [{"value": item[0], "label": item[0]} for item in size]
 
-            #pdb.set_trace()
             if filters["Market_Segment"] ==[] and filters["Category"] ==[] and filters["Competitive_Set"] ==[]:
                 with connection.cursor() as cursor:
                     cursor.execute(f'''
@@ -363,7 +362,6 @@ class CommonFilter(View):
                     )
 
                     user_data = cursor.fetchall()
-                    pdb.set_trace()
                     user_data_list = user_data[0][0].split(',')
                     result_array = [{"value": item, "label": item} for item in user_data_list]
                     query = f'''
@@ -698,7 +696,8 @@ class CommonFilter(View):
                     category_values = ', '.join(f"'{item['value']}'" for item in category_result_array)
                     
                     if len(filters["Category"])==1:
-                        query = f"select BrandName from dynamicFilterDetailed where Category = '{filters["Category"][0]}'"
+                        category = filters["Category"][0]
+                        query = f"select BrandName from dynamicFilterDetailed where Category = '{category}'"
                         cursor.execute(query)
                     else:
                         cursor.execute(f"select BrandName from dynamicFilterDetailed where Category in {tuple(category_values)}")
@@ -715,30 +714,30 @@ class CommonFilter(View):
                     user_data = cursor.fetchall()
                     user_chain_list = user_data[0][0].split(',')
 
-                main_brand = []
-                for i in all_brand_result:
-                    if i in user_chain_list:
-                        if i not in main_brand:
-                            main_brand.append(i)
+                    main_brand = []
+                    for i in all_brand_result:
+                        if i in user_chain_list:
+                            if i not in main_brand:
+                                main_brand.append(i)
 
-                brand_result_array = [{"value": str(item), "label": str(item)} for item in main_brand]
-                brand_values = ', '.join(f"'{item['value']}'" for item in brand_result_array)
+                    brand_result_array = [{"value": str(item), "label": str(item)} for item in main_brand]
+                    brand_values = ', '.join(f"'{item['value']}'" for item in brand_result_array)
 
-                cursor.execute(f'''
-                select Distinct  Segment from dynamicFilterDetailed
-                where BrandName in ({brand_values}) 
-                and Category in ({category_values})
-                    ''')
-                default_segment = cursor.fetchall()
-                segment_result = [item[0] for item in default_segment]
-                segment_array = [{"value": str(item), "label": str(item)} for item in segment_result]
-                cursor.execute(f'''select Distinct Item from dynamicFilterDetailed
-                                where BrandName in ({brand_values}) 
-                                and Category in ({category_values})
-                                ''')
-                items = cursor.fetchall()
-                item_list = [item[0] for item in items]
-                items_array = [{"value": str(item), "label": str(item)} for item in item_list]
+                    cursor.execute(f'''
+                    select Distinct  Segment from dynamicFilterDetailed
+                    where BrandName in ({brand_values}) 
+                    and Category in ({category_values})
+                        ''')
+                    default_segment = cursor.fetchall()
+                    segment_result = [item[0] for item in default_segment]
+                    segment_array = [{"value": str(item), "label": str(item)} for item in segment_result]
+                    cursor.execute(f'''select Distinct Item from dynamicFilterDetailed
+                                    where BrandName in ({brand_values}) 
+                                    and Category in ({category_values})
+                                    ''')
+                    items = cursor.fetchall()
+                    item_list = [item[0] for item in items]
+                    items_array = [{"value": str(item), "label": str(item)} for item in item_list]
                 response_data = {
                 "success": True,
                 "brand": brand_result_array,
