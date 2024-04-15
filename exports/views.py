@@ -267,7 +267,6 @@ class TrendsExport(View):
                             Size = row[6]
                             price = row[3]
                             ProteinType = row[7]
-                            #pdb.set_trace()
                             formatted_date = row[4]
                             grouped_data[(product, brand, category,PriceSegment,Size,ProteinType)][formatted_date] = price
                             # Extract month from the formatted_date and add it to the set

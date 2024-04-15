@@ -7,9 +7,7 @@ from django.db import connection
 from django.http import JsonResponse
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-import pdb
-import csv
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 
 @method_decorator(csrf_exempt,name='dispatch')
 class Dashboard(View):
@@ -20,39 +18,6 @@ class Dashboard(View):
             filters = data.get('filters', {})
             variations = {}
             variations_mychain = {}
-            # filter_mappings = {
-            #     "Select_Date": "FormattedDate",
-            #     "Market_Segment": "Segments",
-            #     "Competitive_Set": "Brand"
-            #     }
-            # where_conditions = []
-            # params = []
-            # for filter_name, filter_values in filters.items():
-            #     if filter_name !="Timescale":
-            #         if filter_values:
-            #            column_name = filter_mappings.get(filter_name) 
-            #            if column_name:
-            #                 if filter_name == "Select_Date" and filters["Timescale"] == "Vs Last Month":
-            #                     from_date = filter_values
-            #                     given_date = datetime.strptime(from_date, "%b-%y")
-            #                     to_date = given_date - timedelta(days=given_date.day)
-            #                     where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(2)])})")
-            #                     params.extend([from_date, to_date])
-                            
-            #                 elif filter_name == "Select_Date" and filters["Timescale"] == "Vs Last Year":
-            #                     from_date = filter_values
-            #                     given_date = datetime.strptime(from_date, "%b-%y")
-            #                     one_year_before = given_date - relativedelta(years=1)
-            #                     to_date = one_year_before.strftime("%b-%y")
-            #                     where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(2)])})")
-            #                     params.extend([from_date, to_date])
-                            
-            #                 else:
-            #                     where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
-            #                     params.extend(filter_values)
-            # where_clause = ''
-            # if where_conditions:
-            #     where_clause = 'WHERE ' + ' AND '.join(where_conditions)
             if filters["Timescale"] == "Vs Last Month":
                 from_date = filters["Select_Date"]
                 given_date = datetime.strptime(from_date, "%b-%y")
@@ -80,7 +45,7 @@ class Dashboard(View):
                         and BrandName in {tuple(filters["Competitive_Set"])} 
                         and BrandName not in ('{user_data[0]}') 
                         group by AsOfDate,DataType'''
-            #pdb.set_trace()
+            
             with connection.cursor() as cursor:
                     cursor.execute(query)
                     dashboard_data = cursor.fetchall()
