@@ -662,8 +662,9 @@ class CommonFilter(View):
                             if i not in main_brand:
                                 main_brand.append(i)
 
-                    brand_result_array = [{"value": str(item), "label": str(item)} for item in user_chain_list]
-                    brand_values = ', '.join(f"'{item['value']}'" for item in brand_result_array)
+                    brand_result_array = [{"value": str(item), "label": str(item)} for item in main_brand]
+                    seg_brand_array = [{"value": str(item), "label": str(item)} for item in user_chain_list]
+                    brand_values = ', '.join(f"'{item['value']}'" for item in seg_brand_array)
 
                     cursor.execute(f'''
                     select Distinct  Segment from dynamicFilterDetailed
