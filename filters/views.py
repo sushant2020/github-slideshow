@@ -496,7 +496,7 @@ class CommonFilter(View):
                     user_data_list = user_data[0][0].split(',')
                     common_elements = [elem for elem in seg_user_data_list if elem in user_data_list]
                     result_array = [{"value": item, "label": item} for item in common_elements]
-                    segment_result_array = [{"value": str(item), "label": str(item)} for item in filters["Market_Segments"]]
+                    segment_result_array = [{"value": str(item), "label": str(item)} for item in filters["Market_Segment"]]
                     result_values = ', '.join(f"'{item['value']}'" for item in result_array)
                     segment_values = ', '.join(f"'{item['value']}'" for item in segment_result_array)
                     
