@@ -28,7 +28,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 SECRET_KEY = 'django-insecure-^#4u#p2bsk!0wist^7q500-o2kiwrdr3v_+o7+qrau-y6i=s*x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["api-meaningfulvision.azurewebsites.net","127.0.0.1","169.254.130.9"]
 # CORS_ORIGIN_WHITELIST = [

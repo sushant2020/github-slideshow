@@ -15,6 +15,7 @@ from django.views.decorators.cache import cache_page
 class MV_Products(View):
     def post(self, request, *args, **kwargs):
         try:
+            
             where_conditions = []
             params = []
             data = json.loads(request.body)
@@ -23,11 +24,12 @@ class MV_Products(View):
             sort_column = data.get('sort_column')
             sort_type = data.get('sort_type')
             email = data.get('email')
+            dashboard_type = data.get('dashboard_type')
             records_per_page = 50
             offset = (page_number - 1) * records_per_page
 
             filter_mappings = {
-                        "Timescales": "Period",
+                        "Timescales": "Startdate",
                         "Market_Segment": "Segments",
                         "Competitive_Set": "Chain",
                         "Category": "Category",
@@ -39,23 +41,30 @@ class MV_Products(View):
                         "Prices":"Prices"
                     }
             for filter_name, filter_values in filters.items():
+                
                 if filter_values:
                     column_name = filter_mappings.get(filter_name)
                     if column_name:
                         if filter_name == "Timescales":
+                           
                             if len(filter_values) == 2:
-                                # Handle range of dates
                                 from_date = datetime.strptime(filter_values[0].strip(), "%Y-%m-%d")
                                 to_date = datetime.strptime(filter_values[1].strip(), "%Y-%m-%d")
-                                from_date = (from_date - relativedelta(months=1)).strftime("%Y-%m-%d")  # Adjust to previous month
-                                where_conditions.append(f"((CONVERT(datetime, {column_name}, 5) >= %s AND CONVERT(datetime, {column_name}, 5) <= %s))")
-                                params.extend([from_date, to_date])
+                                if dashboard_type =="New this Period":
+                                  
+                                #from_date = (from_date - relativedelta(months=1)).strftime("%Y-%m-%d")  # Adjust to previous month
+                                    where_conditions.append(f"((CONVERT(datetime, {column_name}, 5) > %s AND CONVERT(datetime, {column_name}, 5) < %s))")
+                                    params.extend([from_date, to_date])
+                                else:
+                               #from_date = (from_date - relativedelta(months=1)).strftime("%Y-%m-%d")  # Adjust to previous month
+                                    where_conditions.append(f"((CONVERT(datetime, Enddate, 5) > %s AND CONVERT(datetime, {column_name}, 5) < %s))")
+                                    params.extend([to_date, to_date])
                         else:
                             where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
-                            params.extend(filter_values)
+                            params.extend(filter_values)  
                 else:
                     column_name = filter_mappings.get(filter_name)
-                    if filters["Competitive_Set"]==[] and column_name =="Brand":
+                    if filters["Competitive_Set"]==[] and column_name =="Chain":
                                 with connection.cursor() as cursor:
                                     cursor.execute(f'''
                                         SELECT mo.Chains
@@ -77,11 +86,11 @@ class MV_Products(View):
             order_by_clause = ''
             if sort_column and sort_type:
                 order_by_clause = f"ORDER BY {filter_mappings[sort_column]} {sort_type}"
-
+            pdb.set_trace()
             with connection.cursor() as cursor:
                 cursor.execute(f'''
                     SELECT Chain, Category, ProteinType, Item, Prices, Picture
-                    FROM MVProduct 
+                    FROM vw_MVProduct 
                     {where_clause}
                     {order_by_clause}
                     OFFSET %s ROWS FETCH NEXT %s ROWS ONLY ''',
@@ -92,11 +101,11 @@ class MV_Products(View):
                 
                 if any(filters.values()):
                     # Query to get total count after applying filters
-                    cursor.execute(f'SELECT COUNT(*) FROM MVProduct sbrv {where_clause}', params)
+                    cursor.execute(f'SELECT COUNT(*) FROM vw_MVProduct sbrv {where_clause}', params)
                     total_count = cursor.fetchone()[0]
                 else:
                     # Query to get total count without applying filters
-                    cursor.execute('SELECT COUNT(*) FROM MVProduct')
+                    cursor.execute('SELECT COUNT(*) FROM vw_MVProduct')
                     total_count = cursor.fetchone()[0]
 
 
@@ -162,7 +171,7 @@ class MV_Promotions(View):
                             params.extend(filter_values)
                 else:
                     column_name = filter_mappings.get(filter_name)
-                    if filters["Competitive_Set"]==[] and column_name =="Brand":
+                    if filters["Competitive_Set"]==[] and column_name =="BrandName":
                                 with connection.cursor() as cursor:
                                     cursor.execute(f'''
                                         SELECT mo.Chains

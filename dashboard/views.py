@@ -25,7 +25,7 @@ class Dashboard(View):
                 to_date = to_date.strftime("%b-%y")
 
             elif filters["Timescale"] == "Vs Last Year":
-                from_date = filters["Select_Date"]
+                from_date = filters["Select_Date"][0]
                 given_date = datetime.strptime(from_date, "%b-%y")
                 one_year_before = given_date - relativedelta(years=1)
                 to_date = one_year_before.strftime("%b-%y")
@@ -39,13 +39,19 @@ class Dashboard(View):
                                                 ''',
                                                 )
                                             user_data = cursor.fetchone()
-
-            query = f'''select AsOfDate,DataType, sum(Value) from dbo.vw_MVDashboard vm
-                        where vm.AsOfDate in ('{from_date}', '{to_date}')
-                        and BrandName in {tuple(filters["Competitive_Set"])} 
-                        and BrandName not in ('{user_data[0]}') 
-                        group by AsOfDate,DataType'''
-            
+            if len(filters["Competitive_Set"]) >1:
+                query = f'''select AsOfDate,DataType, sum(Value) from dbo.vw_MVDashboard vm
+                            where vm.AsOfDate in ('{from_date}', '{to_date}')
+                            and BrandName in {tuple(filters["Competitive_Set"])} 
+                            and BrandName not in ('{user_data[0]}') 
+                            group by AsOfDate,DataType'''
+            else:
+                  query = f'''select AsOfDate,DataType, sum(Value) from dbo.vw_MVDashboard vm
+                            where vm.AsOfDate in ('{from_date}', '{to_date}')
+                            and BrandName =  '{filters["Competitive_Set"][0]}'
+                            and BrandName not in ('{user_data[0]}') 
+                            group by AsOfDate,DataType'''
+                  
             with connection.cursor() as cursor:
                     cursor.execute(query)
                     dashboard_data = cursor.fetchall()
@@ -59,12 +65,12 @@ class Dashboard(View):
                     if prev_value is not None:
                         variation = ((current_value / prev_value) - 1) * 100
                         variations[datatype] = f"{variation:.2f}"
-
+           
             query2 = f'''select AsOfDate,DataType, sum(Value) from dbo.vw_MVDashboard vm
                         where vm.AsOfDate in ('{from_date}', '{to_date}')
                         and BrandName in ('{user_data[0]}') 
                         group by AsOfDate,DataType'''
-
+                
             with connection.cursor() as cursor:
                    cursor.execute(query2)
                    my_dashboard_data = cursor.fetchall()

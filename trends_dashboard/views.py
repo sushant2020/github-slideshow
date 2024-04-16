@@ -61,6 +61,8 @@ class Trends_API(View):
                         if filter_values:
                             column_name = filter_mappings.get(filter_name)
                             if column_name:
+                                
+                                    #pdb.set_trace()
                                 if filter_name == "TimescalesTrend":
                                     # Parse month-year strings to datetime objects
                                     start_date = datetime.strptime(filters["TimescalesTrend"][0].strip(), "%Y-%m-%d")
@@ -69,9 +71,13 @@ class Trends_API(View):
                                     where_conditions.append(f"(CONVERT(datetime, {column_name}, 5) >= %s AND CONVERT(datetime, {column_name}, 5) <= %s)")
                                     params.extend([start_date, end_date])
                                 else:
-                                    where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
-                                    params.extend(filter_values)
-                    #
+                                    if filter_name == "Protein_Type" and filter_values == ["All"]:
+                                        #pass
+                                        where_conditions.append(f"{column_name} IN ('NotSet','Chicken','Beef','Plant-Based','Pork','Fish','Turkey','Sea Food','Duck','All','Lamb')")
+                                        
+                                    else:
+                                        where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
+                                        params.extend(filter_values)
                         else:
                             column_name = filter_mappings.get(filter_name)
                             if filters["Competitive_Set"]==[] and column_name =="Brand":
@@ -100,7 +106,7 @@ class Trends_API(View):
                     if sort_column and sort_type:
                         order_by_clause = f"ORDER BY {filter_mappings[sort_column]} {sort_type}"
 
-
+                   
                     with connection.cursor() as cursor:
                         query = f'''
                             SELECT Product, Brand, Category, Prices, FormattedDate, PriceSegment, Size, ProteinType
@@ -195,6 +201,7 @@ class Trends_API(View):
                         if filter_values:
                             column_name = filter_mappings.get(filter_name)
                             if column_name:
+                                
                                 if filter_name == "TimescalesTrend":
                                     if len(filter_values) == 2:
                                         # Handle range of dates
@@ -204,8 +211,14 @@ class Trends_API(View):
                                         where_conditions.append(f"((CONVERT(datetime, {column_name}, 5) >= %s AND CONVERT(datetime, {column_name}, 5) <= %s))")
                                         params.extend([from_date, to_date])
                                 else:
-                                    where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
-                                    params.extend(filter_values)
+                                    if filter_name == "Protein_Type" and filter_values == ["All"]:
+                                    #pass
+                                     
+                                        where_conditions.append(f"{column_name} IN ('NotSet','Chicken','Beef','Plant-Based','Pork','Fish','Turkey','Sea Food','Duck','All','Lamb')")
+                                    
+                                    else:
+                                        where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
+                                        params.extend(filter_values)
                         else:
                             column_name = filter_mappings.get(filter_name)
                             if filters["Competitive_Set"]==[] and column_name =="Brand":
@@ -230,7 +243,7 @@ class Trends_API(View):
                     order_by_clause = ''
                     if sort_column and sort_type:
                         order_by_clause = f"ORDER BY {filter_mappings[sort_column]} {sort_type}"
-
+                
                     with connection.cursor() as cursor:
                         cursor.execute(f'''
                             SELECT Product, Brand, Category, Prices, FormattedDate, PriceSegment,Size,ProteinType
@@ -279,7 +292,9 @@ class Trends_API(View):
                                 if month in prices:
                                     if prev_month_key is not None:
                                         variation_key = f"{month}"
-                                        item[variation_key] = str(round(((prices[month] / prev_month_price) - 1) * 100,2))+' '+'%'
+                                        var = round(((prices[month] / prev_month_price) - 1) * 100,2)
+                                        var_formated = f"{var:.2f}"
+                                        item[variation_key] = str(var_formated)+' '+'%'
                                     prev_month_key = month
                                     prev_month_price = prices[month]
                                     if item not in result:    
@@ -329,21 +344,27 @@ class Trends_API(View):
                         if filter_values:
                             column_name = filter_mappings.get(filter_name)
                             if column_name:
-                                if filter_name == "TimescalesTrend":
-                                    if len(filter_values) == 2:
-                                        from_date = datetime.strptime(filter_values[0].strip(), "%Y-%m-%d")
-                                        to_date = datetime.strptime(filter_values[1].strip(), "%Y-%m-%d")
-                                        prev_year_from_date = (from_date - relativedelta(years=1)).strftime("%Y-%m-%d")
-                                        prev_year_to_date = (to_date - relativedelta(years=1)).strftime("%Y-%m-%d")
-                                        where_conditions.append(f"(({column_name} >= %s AND {column_name} <= %s) OR ({column_name} >= %s AND {column_name} <= %s))")
-                                        params.extend([from_date, to_date, prev_year_from_date, prev_year_to_date])
-                                    # Handle date range
-                                elif filter_name == "City" or filter_name == "Channel":
-                                    where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
-                                    params.extend(filter_values)
-                                else:
-                                    where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
-                                    params.extend(filter_values)
+                        
+                                    if filter_name == "TimescalesTrend":
+                                        if len(filter_values) == 2:
+                                            from_date = datetime.strptime(filter_values[0].strip(), "%Y-%m-%d")
+                                            to_date = datetime.strptime(filter_values[1].strip(), "%Y-%m-%d")
+                                            prev_year_from_date = (from_date - relativedelta(years=1)).strftime("%Y-%m-%d")
+                                            prev_year_to_date = (to_date - relativedelta(years=1)).strftime("%Y-%m-%d")
+                                            where_conditions.append(f"(({column_name} >= %s AND {column_name} <= %s) OR ({column_name} >= %s AND {column_name} <= %s))")
+                                            params.extend([from_date, to_date, prev_year_from_date, prev_year_to_date])
+                                        # Handle date range
+                                    elif filter_name == "City" or filter_name == "Channel":
+                                        where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
+                                        params.extend(filter_values)
+                                    else:
+                                        if filter_name == "Protein_Type" and filter_values == ["All"]:
+                                        #pass
+                                            where_conditions.append(f"{column_name} IN ('NotSet','Chicken','Beef','Plant-Based','Pork','Fish','Turkey','Sea Food','Duck','All','Lamb')")
+                                            
+                                        else:
+                                            where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
+                                            params.extend(filter_values)
                         else:
                             column_name = filter_mappings.get(filter_name)
                             if filters["Competitive_Set"]==[] and column_name =="Brand":
@@ -362,7 +383,7 @@ class Trends_API(View):
 
                     where_clause = 'WHERE ' + ' AND '.join(where_conditions) if where_conditions else ''
                     order_by_clause = f"ORDER BY {filter_mappings[sort_column]} {sort_type}" if sort_column and sort_type else ''
-
+                    #pdb.set_trace()
                     with connection.cursor() as cursor:
                         cursor.execute(f'''
                             SELECT Product, Brand, Category, Prices, FormattedDate, PriceSegment,Size,ProteinType
@@ -375,7 +396,7 @@ class Trends_API(View):
 
                         grouped_data = defaultdict(lambda: defaultdict(dict))
                         all_months = set()  # Set to store all months encountered
-
+    
                         for row in user_data:
                             product = row[0]
                             brand = row[1]
@@ -412,7 +433,9 @@ class Trends_API(View):
                                     prev_year_month = (datetime.strptime(month, "%b-%y") - relativedelta(years=1)).strftime("%b-%y")
                                     if prev_year_month in prev_year_prices:
                                         variation_key = f"{month}"
-                                        item[variation_key] = str(round(((prices[month] / prev_year_prices[prev_year_month]) - 1) * 100, 2))+' '+'%'
+                                        var = round(((prices[month] / prev_year_prices[prev_year_month]) - 1) * 100, 2)
+                                        var_formated = f"{var:.2f}"
+                                        item[variation_key] = str(var_formated)+' '+'%'
                                     prev_year_prices[month] = prices[month]
                                     if item not in result:
                                         result.append(item)
@@ -466,20 +489,26 @@ class Trends_API(View):
                         if filter_values:
                             column_name = filter_mappings.get(filter_name)
                             if column_name:
-                                if filter_name == "TimescalesTrend":
-                                    # Parse month-year strings to datetime objects
-                                    start_date = datetime.strptime(filters["TimescalesTrend"][0].strip(), "%Y-%m-%d")
-                                    end_date = datetime.strptime(filters["TimescalesTrend"][1].strip(), "%Y-%m-%d")
-                                    # Add condition to check if FormattedDate is between start_date and end_date
-                                    where_conditions.append(f"(CONVERT(datetime, {column_name}, 5) >= %s AND CONVERT(datetime, {column_name}, 5) <= %s)")
-                                    params.extend([start_date, end_date])
-                                else:
-                                    where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
-                                    params.extend(filter_values)
+                               
+                                    if filter_name == "TimescalesTrend":
+                                        # Parse month-year strings to datetime objects
+                                        start_date = datetime.strptime(filters["TimescalesTrend"][0].strip(), "%Y-%m-%d")
+                                        end_date = datetime.strptime(filters["TimescalesTrend"][1].strip(), "%Y-%m-%d")
+                                        # Add condition to check if FormattedDate is between start_date and end_date
+                                        where_conditions.append(f"(CONVERT(datetime, {column_name}, 5) >= %s AND CONVERT(datetime, {column_name}, 5) <= %s)")
+                                        params.extend([start_date, end_date])
+                                    else:
+                                        if filter_name == "Protein_Type" and filter_values == ["All"]:
+                                        #pass
+                                            where_conditions.append(f"{column_name} IN ('NotSet','Chicken','Beef','Plant-Based','Pork','Fish','Turkey','Sea Food','Duck','All','Lamb')")
+                                            
+                                        else:
+                                            where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
+                                            params.extend(filter_values)
                         else:
                             column_name = filter_mappings.get(filter_name)
                             if filters["Competitive_Set"]==[] and column_name =="BrandName":
-                                        with connection.cursor() as cursor:
+                                        with connection.cursor() as cursor: 
                                             cursor.execute(f'''
                                                 SELECT mo.Chains
                                                     FROM MetaOrganization mo
@@ -588,8 +617,18 @@ class Trends_API(View):
                                         where_conditions.append(f"((CONVERT(datetime, {column_name}, 5) >= %s AND CONVERT(datetime, {column_name}, 5) <= %s))")
                                         params.extend([from_date, to_date])
                                 else:
-                                    where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
-                                    params.extend(filter_values)
+                                    if filter_name == "Protein_Type" and filter_values == ["All"]:
+                                        #pass
+                                        where_conditions.append(f"{column_name} IN ('NotSet','Chicken','Beef','Plant-Based','Pork','Fish','Turkey','Sea Food','Duck','All','Lamb')")
+                                        
+                                    else:
+                                        if filter_name == "Protein_Type" and filter_values == ["All"]:
+                                        #pass
+                                            where_conditions.append(f"{column_name} IN ('NotSet','Chicken','Beef','Plant-Based','Pork','Fish','Turkey','Sea Food','Duck','All','Lamb')")
+                                            
+                                        else:
+                                            where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
+                                            params.extend(filter_values)
                         else:
                             column_name = filter_mappings.get(filter_name)
                             if filters["Competitive_Set"]==[] and column_name =="BrandName":
@@ -658,7 +697,9 @@ class Trends_API(View):
                                 if month in prices:
                                     if prev_month_key is not None:
                                         variation_key = f"{month}"
-                                        item[variation_key] = str(round(((prices[month] / prev_month_price) - 1) * 100,2))+' '+'%'
+                                        var = round(((prices[month] / prev_month_price) - 1) * 100,2)
+                                        var_formated = f"{var:.2f}"
+                                        item[variation_key] = str(var_formated)+' '+'%'
                             
                                     prev_month_key = month
                                     prev_month_price = prices[month]
@@ -719,8 +760,13 @@ class Trends_API(View):
                                     where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
                                     params.extend(filter_values)
                                 else:
-                                    where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
-                                    params.extend(filter_values)
+                                    if filter_name == "Protein_Type" and filter_values == ["All"]:
+                                        #pass
+                                        where_conditions.append(f"{column_name} IN ('NotSet','Chicken','Beef','Plant-Based','Pork','Fish','Turkey','Sea Food','Duck','All','Lamb')")
+                                        
+                                    else:
+                                        where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
+                                        params.extend(filter_values)
                         else:
                             column_name = filter_mappings.get(filter_name)
                             if filters["Competitive_Set"]==[] and column_name =="BrandName":
@@ -792,7 +838,9 @@ class Trends_API(View):
                                     prev_year_month = (datetime.strptime(month, "%b-%y") - relativedelta(years=1)).strftime("%b-%y")
                                     if prev_year_month in prev_year_prices:
                                         variation_key = f"{month}"
-                                        item[variation_key] = str(round(((prices[month] / prev_year_prices[prev_year_month]) - 1) * 100,2))+' '+'%'
+                                        var = round(((prices[month] / prev_year_prices[prev_year_month]) - 1) * 100,2)
+                                        var_formated = f"{var:.2f}"
+                                        item[variation_key] = str(var_formated)+' '+'%'
                                      
                                     prev_year_prices[month] = prices[month]
                                     if item not in result:
