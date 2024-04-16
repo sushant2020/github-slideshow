@@ -1495,3 +1495,55 @@ class ItemFilterAPI(View):
                     return JsonResponse(response_data, status=200)
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)     
+        
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class PromoTypeFilter(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            data = json.loads(request.body)
+            promo_type = data.get('promo_type', '')
+            query = f'''select distinct  mpt2.PromoType2 from MeaningfulPromos mp
+                    inner join MetaPromoType mpt
+                    on mpt.PromoTypeId = mp.PromoType
+                    inner join MetaPromoType2 mpt2
+                    on mpt2.PromoType2Id = mp.PromoType2
+                    where mpt.PromoType = '{promo_type}' '''
+           
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                promo_type2 = cursor.fetchall()
+                result = [item[0] for item in promo_type2]
+                result_array = [{"value": str(item), "label": str(item)} for item in result]
+                response_data = {
+                        "success": True,
+                        "item": result_array,
+                    }
+                return JsonResponse(response_data, status=200)
+        except Exception as err:
+            return JsonResponse({'success': False, 'message': str(err)}, status=500)  
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class PromoFilter(View):
+    def get(self, request, *args, **kwargs):
+        try:
+           query = f'''select distinct mpt.PromoType from MeaningfulPromos mp
+                    inner join MetaPromoType mpt
+                    on mpt.PromoTypeId = mp.PromoType
+                    inner join MetaPromoType2 mpt2
+                    on mpt2.PromoType2Id = mp.PromoType2
+                    '''
+           with connection.cursor() as cursor:
+                cursor.execute(query)
+                promo_type2 = cursor.fetchall()
+                result = [item[0] for item in promo_type2]
+                result_array = [{"value": str(item), "label": str(item)} for item in result]
+                response_data = {
+                        "success": True,
+                        "item": result_array,
+                    }
+                return JsonResponse(response_data, status=200)
+        except Exception as err:
+            return JsonResponse({'success': False, 'message': str(err)}, status=500)  
