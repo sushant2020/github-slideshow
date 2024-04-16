@@ -141,7 +141,8 @@ class MV_Promotions(View):
                         "Promo_Type": "PromoType",
                         "Promo_Type2":"PromoType2",
                         "BrandName":"BrandName",
-                        "Title":"Title"
+                        "Title":"Title",
+                        "Chain":"Chain"
                         
                     }
             for filter_name, filter_values in filters.items():
