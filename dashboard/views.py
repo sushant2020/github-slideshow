@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.http import JsonResponse
+import pdb
 
 @method_decorator(csrf_exempt,name='dispatch')
 class Dashboard(View):
@@ -18,13 +19,14 @@ class Dashboard(View):
             filters = data.get('filters', {})
             variations = {}
             variations_mychain = {}
-            if filters["Timescale"] == "Vs Last Month":
-                from_date = filters["Select_Date"]
+            if filters["Timescale"][0] == "Vs Last Month":
+                from_date = filters["Select_Date"][0]
                 given_date = datetime.strptime(from_date, "%b-%y")
                 to_date = given_date - timedelta(days=given_date.day)
                 to_date = to_date.strftime("%b-%y")
 
-            elif filters["Timescale"] == "Vs Last Year":
+            elif filters["Timescale"][0] == "Vs Last Year":
+                pdb.set_trace()
                 from_date = filters["Select_Date"][0]
                 given_date = datetime.strptime(from_date, "%b-%y")
                 one_year_before = given_date - relativedelta(years=1)
