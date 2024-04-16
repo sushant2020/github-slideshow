@@ -26,7 +26,6 @@ class Dashboard(View):
                 to_date = to_date.strftime("%b-%y")
 
             elif filters["Timescale"][0] == "Vs Last Year":
-                pdb.set_trace()
                 from_date = filters["Select_Date"][0]
                 given_date = datetime.strptime(from_date, "%b-%y")
                 one_year_before = given_date - relativedelta(years=1)

@@ -86,7 +86,7 @@ class MV_Products(View):
             order_by_clause = ''
             if sort_column and sort_type:
                 order_by_clause = f"ORDER BY {filter_mappings[sort_column]} {sort_type}"
-            pdb.set_trace()
+            
             with connection.cursor() as cursor:
                 cursor.execute(f'''
                     SELECT Chain, Category, ProteinType, Item, Prices, Picture
