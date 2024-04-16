@@ -131,7 +131,6 @@ class MV_Promotions(View):
             email = data.get('email')
             records_per_page = 50
             offset = (page_number - 1) * records_per_page
-
             filter_mappings = {
                         "Timescales": "StartDate",
                         "Market_Segment": "Segments",
@@ -141,6 +140,8 @@ class MV_Promotions(View):
                         "Category": "Category",
                         "Promo_Type": "PromoType",
                         "Promo_Type2":"PromoType2",
+                        "BrandName":"BrandName",
+                        "Title":"Title"
                         
                     }
             for filter_name, filter_values in filters.items():
