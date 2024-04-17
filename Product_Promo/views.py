@@ -50,8 +50,8 @@ class MV_Products(View):
                             if len(filter_values) == 2:
                                 from_date = datetime.strptime(filter_values[0].strip(), "%Y-%m-%d")
                                 to_date = datetime.strptime(filter_values[1].strip(), "%Y-%m-%d")
-                                if dashboard_type =="New this Period":
-                                  
+                                if dashboard_type ==1:
+    
                                 #from_date = (from_date - relativedelta(months=1)).strftime("%Y-%m-%d")  # Adjust to previous month
                                     where_conditions.append(f"((CONVERT(datetime, {column_name}, 5) > %s AND CONVERT(datetime, {column_name}, 5) < %s))")
                                     params.extend([from_date, to_date])
