@@ -40,6 +40,7 @@ class Dashboard(View):
                                                 ''',
                                                 )
                                             user_data = cursor.fetchone()
+
             if len(filters["Competitive_Set"]) >1:
                 query = f'''select AsOfDate,DataType, sum(Value) from dbo.vw_MVDashboard vm
                             where vm.AsOfDate in ('{from_date}', '{to_date}')
@@ -64,8 +65,12 @@ class Dashboard(View):
                     prev_month = to_date
                     prev_value = data_dict.get((prev_month, datatype))
                     if prev_value is not None:
-                        variation = ((current_value / prev_value) - 1) * 100
-                        variations[datatype] = f"{variation:.2f}"
+                        if datatype == "Product" or datatype == "Promo":
+                            variation = int(current_value - prev_value)
+                            variations[datatype] = variation
+                        else:
+                            variation = ((current_value / prev_value) - 1) * 100
+                            variations[datatype] = f"{variation:.2f}%"
            
             query2 = f'''select AsOfDate,DataType, sum(Value) from dbo.vw_MVDashboard vm
                         where vm.AsOfDate in ('{from_date}', '{to_date}')
@@ -81,8 +86,13 @@ class Dashboard(View):
                     prev_month = to_date
                     prev_value = my_data_dict.get((prev_month, datatype))
                     if prev_value is not None:
-                        variation = ((current_value / prev_value) - 1) * 100
-                        variations_mychain[datatype] = f"{variation:.2f}"
+                        if datatype == "Product" or datatype == "Promo" :
+                            variation = int(current_value - prev_value)
+            
+                            variations_mychain[datatype] = variation
+                        else:
+                            variation = ((current_value / prev_value) - 1) * 100
+                            variations_mychain[datatype] = f"{variation:.2f}%"
             response_data = {
                             "success": True,
                             "data": variations,

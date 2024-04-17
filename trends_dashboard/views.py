@@ -293,7 +293,7 @@ class Trends_API(View):
                                     if prev_month_key is not None:
                                         variation_key = f"{month}"
                                         var = round(((prices[month] / prev_month_price) - 1) * 100,2)
-                                        var_formated = f"{var:.2f}"
+                                        var_formated = f"{var:.1f}"
                                         item[variation_key] = str(var_formated)+' '+'%'
                                     prev_month_key = month
                                     prev_month_price = prices[month]
@@ -434,7 +434,7 @@ class Trends_API(View):
                                     if prev_year_month in prev_year_prices:
                                         variation_key = f"{month}"
                                         var = round(((prices[month] / prev_year_prices[prev_year_month]) - 1) * 100, 2)
-                                        var_formated = f"{var:.2f}"
+                                        var_formated = f"{var:.1f}"
                                         item[variation_key] = str(var_formated)+' '+'%'
                                     prev_year_prices[month] = prices[month]
                                     if item not in result:
@@ -698,7 +698,7 @@ class Trends_API(View):
                                     if prev_month_key is not None:
                                         variation_key = f"{month}"
                                         var = round(((prices[month] / prev_month_price) - 1) * 100,2)
-                                        var_formated = f"{var:.2f}"
+                                        var_formated = f"{var:.1f}"
                                         item[variation_key] = str(var_formated)+' '+'%'
                             
                                     prev_month_key = month
@@ -839,7 +839,7 @@ class Trends_API(View):
                                     if prev_year_month in prev_year_prices:
                                         variation_key = f"{month}"
                                         var = round(((prices[month] / prev_year_prices[prev_year_month]) - 1) * 100,2)
-                                        var_formated = f"{var:.2f}"
+                                        var_formated = f"{var:.1f}"
                                         item[variation_key] = str(var_formated)+' '+'%'
                                      
                                     prev_year_prices[month] = prices[month]
