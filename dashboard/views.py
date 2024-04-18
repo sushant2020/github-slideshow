@@ -68,22 +68,22 @@ class Dashboard(View):
                     if prev_value is not None:
                         if datatype == "Product" or datatype == "Promo":
                             absolute_variation = int(current_value - prev_value)
-                            variations[f"absolute_{datatype}"] = absolute_variation
+                            variations[f"absolute_{datatype}"] = str(absolute_variation)
                             variation = ((current_value / prev_value) - 1) * 100
-                            variations[datatype] = f"{variation:.1f}%"
+                            variations[datatype] = str(f"{variation:.1f}%")
 
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
-                            variations[datatype] = f"{variation:.1f}%"
+                            variations[datatype] = str(f"{variation:.1f}%")
                     else:
                         if datatype == "Product" or datatype == "Promo":
                             absolute_variation = int(current_value)
-                            variations[f"absolute_{datatype}"] = absolute_variation
-                            variation = 0
+                            variations[f"absolute_{datatype}"] = str(absolute_variation)
+                            variation = "0"
                             variations[datatype] = variation
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
-                            variations_mychain[datatype] = f"{variation:.1f}%"
+                            variations_mychain[datatype] = str(f"{variation:.1f}%")
            
             # Query and calculate variation for user's chain
             query2 = f'''select AsOfDate,DataType, sum(Value) from dbo.vw_MVDashboard vm
@@ -109,21 +109,21 @@ class Dashboard(View):
                     if prev_value is not None:
                         if datatype == "Product" or datatype == "Promo":
                             absolute_variation = int(current_value - prev_value)
-                            variations_mychain[f"absolute_{datatype}"] = absolute_variation
+                            variations_mychain[f"absolute_{datatype}"] = str(absolute_variation)
                             variation = ((current_value / prev_value) - 1) * 100
-                            variations_mychain[datatype] = f"{variation:.1f}%"
+                            variations_mychain[datatype] = str(f"{variation:.1f}%")
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
-                            variations_mychain[datatype] = f"{variation:.1f}%"
+                            variations_mychain[datatype] = str(f"{variation:.1f}%")
                     else:
                         if datatype == "Product" or datatype == "Promo":
                             absolute_variation = int(current_value)
-                            variations_mychain[f"absolute_{datatype}"] = absolute_variation
+                            variations_mychain[f"absolute_{datatype}"] = str(absolute_variation)
                             #variation = 0
-                            variations_mychain[datatype] = 0
+                            variations_mychain[datatype] = "0"
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
-                            variations_mychain[datatype] = f"{variation:.1f}%"
+                            variations_mychain[datatype] = str(f"{variation:.1f}%")
             # Create response data
          
             response_data = {
