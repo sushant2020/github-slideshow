@@ -38,7 +38,8 @@ class SnapshotRegionAPI(View):
                 "Protein_Type": "ProteinType",
                 "Channel": "ChannelName",
                 "Product1" : "Product",
-                "City":"City"
+                "City":"City",
+                "Product" : "Product"
             }
 
             for filter_name, filter_values in filters.items():
@@ -143,7 +144,8 @@ class SnapshotChannelAPI(View):
                 "JustEat":"JustEat",
                 "Item":"Product",
                 "Brand":"Brand",
-                "Uber Eats":"UberEats"
+                "Uber Eats":"UberEats",
+                "Product1" : "Product",
             }
             data = json.loads(request.body)
             page_number = data.get('page_number', 1)
@@ -247,7 +249,10 @@ class SnapshotVariationAPI(View):
                 "Channel": "ChannelName",
                 "Protein_Type": "ProteinType",
                 "Category": "Category",
-                "Item": "Product"
+                "Item": "Product",
+                "Product1" : "Product",
+                "Product" : "Product",
+                
             }
 
             data = json.loads(request.body)

@@ -62,7 +62,6 @@ class Trends_API(View):
                             column_name = filter_mappings.get(filter_name)
                             if column_name:
                                 
-                                    #pdb.set_trace()
                                 if filter_name == "TimescalesTrend":
                                     # Parse month-year strings to datetime objects
                                     start_date = datetime.strptime(filters["TimescalesTrend"][0].strip(), "%Y-%m-%d")
@@ -383,7 +382,7 @@ class Trends_API(View):
 
                     where_clause = 'WHERE ' + ' AND '.join(where_conditions) if where_conditions else ''
                     order_by_clause = f"ORDER BY {filter_mappings[sort_column]} {sort_type}" if sort_column and sort_type else ''
-                    #pdb.set_trace()
+                 
                     with connection.cursor() as cursor:
                         cursor.execute(f'''
                             SELECT Product, Brand, Category, Prices, FormattedDate, PriceSegment,Size,ProteinType
