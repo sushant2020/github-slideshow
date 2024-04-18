@@ -147,11 +147,12 @@ class MV_Promotions(View):
                         "City":"City",
                         "Source_Type":"ChannelName",
                         "Category": "Category",
-                        "Promo_Type": "PromoType",
-                        "Promo_Type2":"PromoType2",
+                        "PromoType": "PromoType",
+                        "PromoType2":"PromoType2",
                         "BrandName":"BrandName",
                         "Title":"Title",
-                        "Chain":"Chain"
+                        "Chain":"BrandName",
+                        "Description":"Description"
                         
                     }
             for filter_name, filter_values in filters.items():
