@@ -41,7 +41,15 @@ class SnapshotRegionAPI(View):
                 "City":"City",
                 "Product" : "Product",
                 "Brand":"Brand",
-                "Belfast":"Belfast"
+                "Belfast":"Belfast",
+                "Birmingham":"Birmingham",
+                "Cardiff":"Cardiff",
+                "Glasgow":"Glasgow",
+                "Liverpool":"Liverpool",
+                "Leeds":"Leeds",
+                "Manchester":"Manchester",
+                "London":"London",
+                "Bristol":"Bristol"
             }
 
             for filter_name, filter_values in filters.items():
@@ -77,7 +85,7 @@ class SnapshotRegionAPI(View):
 
 
             order_by_clause = ''
-            if sort_column and sort_type and sort_column not in ["Product1","Brand"]:
+            if sort_column and sort_type and sort_column not in ["Product1","Brand","Product"]:
 
                 order_by_clause = f'ORDER BY cast({filter_mappings[sort_column]} As float) {sort_type}'
             else:
@@ -190,7 +198,7 @@ class SnapshotChannelAPI(View):
 
             # Construct ORDER BY clause for sorting
             order_by_clause = ''
-            if sort_column and sort_type and sort_column not in ["Item","Brand"]:
+            if sort_column and sort_type and sort_column not in ["Item","Brand","Product1","Product"]:
                 order_by_clause = f'ORDER BY cast("{filter_mappings[sort_column]}" As float) {sort_type}'
             
             else:
@@ -262,7 +270,13 @@ class SnapshotVariationAPI(View):
                 "Item": "Product",
                 "Product1" : "Product",
                 "Product" : "Product",
-                
+                "Brand":"Brand",
+                "MinPrice":"MinPrice",
+                "MaxPrice":"MaxPrice",
+                "AvgPrice":"AvgPrice",
+                "ModePrice":"ModePrice",
+                "Variation":"Variation"
+
             }
 
             data = json.loads(request.body)
@@ -297,9 +311,11 @@ class SnapshotVariationAPI(View):
                     params.extend(user_data_list)
 
             order_by_clause = ''
-            if sort_column and sort_type:
+            if sort_column and sort_type and sort_column not in ["Item","Product1","Product","Brand"]:
                 order_by_clause = f'ORDER BY cast("{filter_mappings[sort_column]}" As float) {sort_type}'
-            
+            else:
+                order_by_clause = f'ORDER BY {filter_mappings[sort_column]} {sort_type}'
+
             offset = (page_number - 1) * page_size
             limit_offset_clause = f'OFFSET {offset} ROWS FETCH NEXT {page_size} ROWS ONLY'
             
