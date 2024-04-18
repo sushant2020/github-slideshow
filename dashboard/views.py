@@ -19,8 +19,8 @@ class Dashboard(View):
             filters = data.get('filters', {})
             variations = {}
             variations_mychain = {}
-            
-            if filters["Timescale"][0] == "Vs Last Month":
+            # pdb.set_trace()
+            if filters["Timescale"]==[]:
                 from_date = filters["Select_Date"][0]
                 given_date = datetime.strptime(from_date, "%b-%y")
                 to_date = given_date - timedelta(days=given_date.day)
@@ -31,6 +31,12 @@ class Dashboard(View):
                 given_date = datetime.strptime(from_date, "%b-%y")
                 one_year_before = given_date - relativedelta(years=1)
                 to_date = one_year_before.strftime("%b-%y")
+            
+            elif filters["Timescale"][0] == "Vs Last Month":
+                from_date = filters["Select_Date"][0]
+                given_date = datetime.strptime(from_date, "%b-%y")
+                to_date = given_date - timedelta(days=given_date.day)
+                to_date = to_date.strftime("%b-%y")
 
             with connection.cursor() as cursor:
                 cursor.execute(f'''
