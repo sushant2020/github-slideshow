@@ -68,9 +68,9 @@ class Dashboard(View):
                     if prev_value is not None:
                         if datatype == "Product" or datatype == "Promo":
                             absolute_variation = int(current_value - prev_value)
-                            variations[datatype] = absolute_variation
+                            variations[f"absolute_{datatype}"] = absolute_variation
                             variation = ((current_value / prev_value) - 1) * 100
-                            variations[f"absolute_{datatype}"] = f"{variation:.1f}%"
+                            variations[{datatype}] = f"{variation:.1f}%"
 
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
@@ -78,9 +78,9 @@ class Dashboard(View):
                     else:
                         if datatype == "Product" or datatype == "Promo":
                             absolute_variation = int(current_value)
-                            variations[datatype] = absolute_variation
+                            variations[f"absolute_{datatype}"] = absolute_variation
                             variation = 0
-                            variations[f"absolute_{datatype}"] = f"{variation:.1f}%"
+                            variations[{datatype}] = f"{variation:.1f}%"
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
                             variations_mychain[datatype] = f"{variation:.1f}%"
