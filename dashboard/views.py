@@ -40,11 +40,25 @@ class Dashboard(View):
                     WHERE um.Email = '{email}'
                 ''')
                 user_data = cursor.fetchone()
-
+                cursor.execute(f'''
+                                                SELECT mo.Chains
+                                                    FROM MetaOrganization mo
+                                                    JOIN user_management um ON mo.Organization = um.Organization 
+                                                    WHERE um.Email = '{email}'
+                                                ''',
+                                                )
+                user_chain_data = cursor.fetchall()
+                user_data_list = [brand.strip() for brand in user_chain_data[0][0].split(',')]
             if len(filters["Competitive_Set"]) > 1:
                 query = f'''select AsOfDate,DataType, sum(Value) from dbo.vw_MVDashboard vm
                             where vm.AsOfDate in ('{from_date}', '{to_date}')
                             and BrandName in {tuple(filters["Competitive_Set"])} 
+                            and BrandName not in ('{user_data[0]}') 
+                            group by AsOfDate,DataType'''
+            elif len(filters["Competitive_Set"])==0:
+                query = f'''select AsOfDate,DataType, sum(Value) from dbo.vw_MVDashboard vm
+                            where vm.AsOfDate in ('{from_date}', '{to_date}')
+                            and BrandName in {tuple(user_data_list)} 
                             and BrandName not in ('{user_data[0]}') 
                             group by AsOfDate,DataType'''
             else:
