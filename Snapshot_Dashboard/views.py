@@ -39,7 +39,9 @@ class SnapshotRegionAPI(View):
                 "Channel": "ChannelName",
                 "Product1" : "Product",
                 "City":"City",
-                "Product" : "Product"
+                "Product" : "Product",
+                "Brand":"Brand",
+                "Belfast":"Belfast"
             }
 
             for filter_name, filter_values in filters.items():
@@ -75,9 +77,12 @@ class SnapshotRegionAPI(View):
 
 
             order_by_clause = ''
-            if sort_column and sort_type:
-                order_by_clause = f"ORDER BY {filter_mappings[sort_column]} {sort_type}"
+            if sort_column and sort_type and sort_column not in ["Product1","Brand"]:
 
+                order_by_clause = f'ORDER BY cast({filter_mappings[sort_column]} As float) {sort_type}'
+            else:
+                order_by_clause = f'ORDER BY {filter_mappings[sort_column]} {sort_type}'
+            
 
 
             with connection.cursor() as cursor:
@@ -89,13 +94,14 @@ class SnapshotRegionAPI(View):
                     # Query to get total count without applying filters
                     cursor.execute('SELECT COUNT(*) FROM SnapshotByRegionView')
                     total_count = cursor.fetchone()[0]
-
-                cursor.execute(f'''
+                query = f'''
                     SELECT Product, Brand, Birmingham, Belfast, Cardiff, Glasgow, Liverpool, Leeds, Manchester, London, Bristol
                     FROM SnapshotByRegionView sbrv 
                     {where_clause}
                     {order_by_clause}
-                    OFFSET %s ROWS FETCH NEXT %s ROWS ONLY ''',
+                    OFFSET %s ROWS FETCH NEXT %s ROWS ONLY '''
+                #pdb.set_trace()
+                cursor.execute(query,
                     params + [offset, records_per_page])
 
                 user_data = cursor.fetchall()
@@ -184,9 +190,12 @@ class SnapshotChannelAPI(View):
 
             # Construct ORDER BY clause for sorting
             order_by_clause = ''
-            if sort_column and sort_type:
-                order_by_clause = f'ORDER BY "{filter_mappings[sort_column]}" {sort_type}'
-
+            if sort_column and sort_type and sort_column not in ["Item","Brand"]:
+                order_by_clause = f'ORDER BY cast("{filter_mappings[sort_column]}" As float) {sort_type}'
+            
+            else:
+                order_by_clause = f'ORDER BY {filter_mappings[sort_column]} {sort_type}'
+            
             # Construct LIMIT and OFFSET for pagination
             offset = (page_number - 1) * page_size
             limit_offset_clause = f'OFFSET {offset} ROWS FETCH NEXT {page_size} ROWS ONLY'
@@ -202,6 +211,7 @@ class SnapshotChannelAPI(View):
             if order_by_clause:
                 query += ' ' + order_by_clause
             query += ' ' + limit_offset_clause
+            
             # Execute the SQL query
             with connection.cursor() as cursor:
                 cursor.execute(query, params)
@@ -288,7 +298,7 @@ class SnapshotVariationAPI(View):
 
             order_by_clause = ''
             if sort_column and sort_type:
-                order_by_clause = f'ORDER BY "{sort_column}" {sort_type}'
+                order_by_clause = f'ORDER BY cast("{filter_mappings[sort_column]}" As float) {sort_type}'
             
             offset = (page_number - 1) * page_size
             limit_offset_clause = f'OFFSET {offset} ROWS FETCH NEXT {page_size} ROWS ONLY'

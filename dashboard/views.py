@@ -75,7 +75,15 @@ class Dashboard(View):
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
                             variations[datatype] = f"{variation:.1f}%"
-
+                    else:
+                        if datatype == "Product" or datatype == "Promo":
+                            absolute_variation = int(current_value)
+                            variations[datatype] = absolute_variation
+                            variation = 0
+                            variations[f"absolute_{datatype}"] = f"{variation:.1f}%"
+                        else:
+                            variation = ((current_value / prev_value) - 1) * 100
+                            variations_mychain[datatype] = f"{variation:.1f}%"
             # Query and calculate variation for user's chain
             query2 = f'''select AsOfDate,DataType, sum(Value) from dbo.vw_MVDashboard vm
                         where vm.AsOfDate in ('{from_date}', '{to_date}')
@@ -105,13 +113,21 @@ class Dashboard(View):
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
                             variations_mychain[datatype] = f"{variation:.1f}%"
-
+                    else:
+                        if datatype == "Product" or datatype == "Promo":
+                            absolute_variation = int(current_value)
+                            variations_mychain[f"absolute_{datatype}"] = absolute_variation
+                            variation = 0
+                            variations_mychain[datatype] = f"{variation:.1f}%"
+                        else:
+                            variation = ((current_value / prev_value) - 1) * 100
+                            variations_mychain[datatype] = f"{variation:.1f}%"
             # Create response data
          
             response_data = {
                 "success": True,
                 "data": variations,
-                "my_data": {datatype: "-" for datatype in variations} if not my_data_dict else variations_mychain
+                "my_data": variations_mychain #{datatype: "-" for datatype in variations} if not my_data_dict else variations_mychain
             }
 
             return JsonResponse(response_data, status=200)
