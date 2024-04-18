@@ -37,7 +37,7 @@ class SnapshotRegionAPI(View):
                 "Category": "Category",
                 "Protein_Type": "ProteinType",
                 "Channel": "ChannelName",
-                "Item" : "Product",
+                "Product1" : "Product",
                 "City":"City"
             }
 
@@ -75,7 +75,7 @@ class SnapshotRegionAPI(View):
 
             order_by_clause = ''
             if sort_column and sort_type:
-                order_by_clause = f"ORDER BY {sort_column} {sort_type}"
+                order_by_clause = f"ORDER BY {filter_mappings[sort_column]} {sort_type}"
 
 
 
@@ -237,7 +237,6 @@ class SnapshotChannelAPI(View):
 class SnapshotVariationAPI(View):
     def post(self, request, *args, **kwargs):
         try:
-            
             last_month = (datetime.today().replace(day=1) - timedelta(days=1)).strftime('%b-%y')
             print(last_month)
 
@@ -248,43 +247,40 @@ class SnapshotVariationAPI(View):
                 "Channel": "ChannelName",
                 "Protein_Type": "ProteinType",
                 "Category": "Category",
-                "Item":"Product"
+                "Item": "Product"
             }
-            # Get page number, filters, sort_column, and sort_type from request data
+
             data = json.loads(request.body)
-            page_number = data.get('page_number', 0)  # Start from page 0 or adjust as needed
+            page_number = data.get('page_number', 0)
             filters = data.get('filters', {})
             sort_column = data.get('sort_column', '')
             sort_type = data.get('sort_type', '')
-            email = data.get("email","")
+            email = data.get("email", "")
             page_size = 20
+            
             # Define base query
             where_conditions = []
             params = []
             for key, value in filters.items():
-
-                if value:  # Check if the filter value is not empty
+                if value:
                     column_name = filter_mappings.get(key)
                     if column_name:
                         where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in value])})")
                         params.extend(value)
-                else:
-                    column_name = filter_mappings.get(key)
-                    if filters["Competitive_Set"]==[] and column_name =="Brand" :
-                        with connection.cursor() as cursor:
-                            cursor.execute(f'''
-                                SELECT mo.Chains
-                                    FROM MetaOrganization mo
-                                    JOIN user_management um ON mo.Organization = um.Organization 
-                                    WHERE um.Email = '{email}'
-                                ''',
-                                )
-                            user_data = cursor.fetchall()
-                            
-                            user_data_list = [brand.strip() for brand in user_data[0][0].split(',')]
-                        where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(user_data_list))])})")
-                        params.extend(user_data_list)        
-            
+                elif filters["Competitive_Set"] == [] and filter_mappings.get(key) == "Brand":
+                    # Retrieve user's chain brands if Competitive_Set filter is empty
+                    with connection.cursor() as cursor:
+                        cursor.execute(f'''
+                            SELECT mo.Chains
+                                FROM MetaOrganization mo
+                                JOIN user_management um ON mo.Organization = um.Organization 
+                                WHERE um.Email = '{email}'
+                        ''')
+                        user_data = cursor.fetchall()
+                        user_data_list = [brand.strip() for brand in user_data[0][0].split(',')]
+                    where_conditions.append(f"{filter_mappings.get(key)} IN ({', '.join(['%s' for _ in range(len(user_data_list))])})")
+                    params.extend(user_data_list)
+
             order_by_clause = ''
             if sort_column and sort_type:
                 order_by_clause = f'ORDER BY "{sort_column}" {sort_type}'
@@ -302,18 +298,17 @@ class SnapshotVariationAPI(View):
             if order_by_clause:
                 query += ' ' + order_by_clause
             query += ' ' + limit_offset_clause
-            
-
 
             with connection.cursor() as cursor:
                 cursor.execute(query, params)
                 user_data = cursor.fetchall()
             
-            keys = ["Product", "Brand","MinPrice", "MaxPrice", "AvgPrice", "ModePrice", "Variation"]
+            keys = ["Product", "Brand", "MinPrice", "MaxPrice", "AvgPrice", "ModePrice", "Variation"]
 
-            result = [dict(zip(keys, row)) for row in user_data if row[-1]]
-           
-            
+            # Append "%" to Variation values and create response data
+            result = [dict(zip(keys, [*row[:-1], f"{row[-1]}%"])) for row in user_data]
+
+            # Get total count
             with connection.cursor() as cursor:
                 if any(filters.values()):
                     # Query to get total count after applying filters
@@ -323,14 +318,13 @@ class SnapshotVariationAPI(View):
                     # Query to get total count without applying filters
                     cursor.execute('SELECT COUNT(*) FROM SnapshotByVariation')
                     total_count = cursor.fetchone()[0]
-            
-            
+
             response_data = {
-                    "success": True,
-                    "data": result,
-                    "total_count": total_count
-                }
+                "success": True,
+                "data": result,
+                "total_count": total_count
+            }
+
             return JsonResponse(response_data, status=200)
         except Exception as e:
-            # Handle other exceptions
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
