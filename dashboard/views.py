@@ -53,13 +53,13 @@ class Dashboard(View):
                             and BrandName =  '{filters["Competitive_Set"][0]}'
                             and BrandName not in ('{user_data[0]}') 
                             group by AsOfDate,DataType'''
-
+            
             with connection.cursor() as cursor:
                 cursor.execute(query)
                 dashboard_data = cursor.fetchall()
 
             data_dict = {(month, datatype): value for month, datatype, value in dashboard_data}
-
+          
             # Calculate variation for competitive set
             for (current_month, datatype), current_value in data_dict.items():
                 if current_month == from_date:
@@ -70,7 +70,7 @@ class Dashboard(View):
                             absolute_variation = int(current_value - prev_value)
                             variations[f"absolute_{datatype}"] = absolute_variation
                             variation = ((current_value / prev_value) - 1) * 100
-                            variations[{datatype}] = f"{variation:.1f}%"
+                            variations[datatype] = f"{variation:.1f}%"
 
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
@@ -80,15 +80,17 @@ class Dashboard(View):
                             absolute_variation = int(current_value)
                             variations[f"absolute_{datatype}"] = absolute_variation
                             variation = 0
-                            variations[{datatype}] = f"{variation:.1f}%"
+                            variations[datatype] = variation
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
                             variations_mychain[datatype] = f"{variation:.1f}%"
+           
             # Query and calculate variation for user's chain
             query2 = f'''select AsOfDate,DataType, sum(Value) from dbo.vw_MVDashboard vm
                         where vm.AsOfDate in ('{from_date}', '{to_date}')
                         and BrandName in ('{user_data[0]}') 
                         group by AsOfDate,DataType'''
+            #pdb.set_trace()
             with connection.cursor() as cursor:
                 cursor.execute(query2)
                 my_dashboard_data = cursor.fetchall()
@@ -117,8 +119,8 @@ class Dashboard(View):
                         if datatype == "Product" or datatype == "Promo":
                             absolute_variation = int(current_value)
                             variations_mychain[f"absolute_{datatype}"] = absolute_variation
-                            variation = 0
-                            variations_mychain[datatype] = f"{variation:.1f}%"
+                            #variation = 0
+                            variations_mychain[datatype] = 0
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
                             variations_mychain[datatype] = f"{variation:.1f}%"
