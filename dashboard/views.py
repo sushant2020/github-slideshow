@@ -67,8 +67,11 @@ class Dashboard(View):
                     prev_value = data_dict.get((prev_month, datatype))
                     if prev_value is not None:
                         if datatype == "Product" or datatype == "Promo":
-                            variation = int(current_value - prev_value)
-                            variations[datatype] = variation
+                            absolute_variation = int(current_value - prev_value)
+                            variations[datatype] = absolute_variation
+                            variation = ((current_value / prev_value) - 1) * 100
+                            variations[f"absolute_{datatype}"] = f"{variation:.1f}%"
+
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
                             variations[datatype] = f"{variation:.1f}%"
@@ -95,14 +98,16 @@ class Dashboard(View):
                     prev_value = my_data_dict.get((prev_month, datatype))
                     if prev_value is not None:
                         if datatype == "Product" or datatype == "Promo":
-                            variation = int(current_value - prev_value)
-                            variations_mychain[datatype] = variation
+                            absolute_variation = int(current_value - prev_value)
+                            variations_mychain[f"absolute_{datatype}"] = absolute_variation
+                            variation = ((current_value / prev_value) - 1) * 100
+                            variations_mychain[datatype] = f"{variation:.1f}%"
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
                             variations_mychain[datatype] = f"{variation:.1f}%"
 
             # Create response data
-            pdb.set_trace()
+         
             response_data = {
                 "success": True,
                 "data": variations,
