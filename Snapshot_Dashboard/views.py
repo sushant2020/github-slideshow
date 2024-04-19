@@ -56,9 +56,12 @@ class SnapshotRegionAPI(View):
                 if filter_values:
                     column_name = filter_mappings.get(filter_name)
                     if column_name !="City":
-                        if column_name:
-                            where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
-                            params.extend(filter_values)
+                        if column_name =="ProteinType" and filter_values==["All"]:
+                            pass
+                        else:
+                            if column_name:
+                                where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
+                                params.extend(filter_values)
                 else:
                     column_name = filter_mappings.get(filter_name)
                     if filters["Competitive_Set"]==[] and column_name =="Brand":
@@ -78,7 +81,7 @@ class SnapshotRegionAPI(View):
                         if filter_name in filter_mappings:
                             column_name = filter_mappings[filter_name]
                             where_conditions.append(f"{column_name} IS NOT NULL")
-
+                    
             where_clause = ''
             if where_conditions:
                 where_clause = 'WHERE ' + ' AND '.join(where_conditions)
@@ -91,7 +94,6 @@ class SnapshotRegionAPI(View):
             else:
                 order_by_clause = f'ORDER BY {filter_mappings[sort_column]} {sort_type}'
             
-
 
             with connection.cursor() as cursor:
                 if any(filters.values()):
@@ -175,9 +177,13 @@ class SnapshotChannelAPI(View):
             for key, value in filters.items():
                 if value:  # Check if the filter value is not empty
                     column_name = filter_mappings.get(key)
+                    
                     if column_name:
-                        where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in value])})")
-                        params.extend(value)
+                        if column_name =="ProteinType" and value==["All"]:
+                            pass
+                        else:
+                            where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in value])})")
+                            params.extend(value)
                 else:
                     column_name = filter_mappings.get(key)
                     if filters["Competitive_Set"]==[] and column_name =="Brand" :
@@ -294,8 +300,12 @@ class SnapshotVariationAPI(View):
                 if value:
                     column_name = filter_mappings.get(key)
                     if column_name:
-                        where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in value])})")
-                        params.extend(value)
+                        if column_name =="ProteinType" and value==["All"]:
+                            pass
+                        else:
+                            where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in value])})")
+                            params.extend(value)
+
                 elif filters["Competitive_Set"] == [] and filter_mappings.get(key) == "Brand":
                     # Retrieve user's chain brands if Competitive_Set filter is empty
                     with connection.cursor() as cursor:
