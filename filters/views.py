@@ -320,8 +320,7 @@ class CommonFilter(View):
         data = json.loads(request.body)
         email = data.get('email', '')
         filters = data.get("filters",{})
-        promo_type = data.get('promo_type', '')
-        
+        Promo_Type = filters['Promo_Type']
         try:
             with connection.cursor() as cursor_protein:
                 cursor_protein.execute(
@@ -367,22 +366,24 @@ class CommonFilter(View):
                     '''
             with connection.cursor() as cursor:
                 cursor.execute(query)
-                promo_type2 = cursor.fetchall()
-                result = [item[0] for item in promo_type2]
+                promo_type = cursor.fetchall()
+                result = [item[0] for item in promo_type]
                 result_array_promo = [{"value": str(item), "label": str(item)} for item in result]
-            if promo_type2 != []:
+            
+            if Promo_Type != []:
                 query = f'''select distinct  mpt2.PromoType2 from MeaningfulPromos mp
                         inner join MetaPromoType mpt
                         on mpt.PromoTypeId = mp.PromoType
                         inner join MetaPromoType2 mpt2
                         on mpt2.PromoType2Id = mp.PromoType2
-                        where mpt.PromoType = '{promo_type}' '''
-            
+                        where mpt.PromoType = '{Promo_Type[0]}' '''
+          
                 with connection.cursor() as cursor:
                     cursor.execute(query)
                     promo_type2 = cursor.fetchall()
                     result = [item[0] for item in promo_type2]
                     result_array_promo2 = [{"value": str(item), "label": str(item)} for item in result]
+                 
             else:
                     result_array_promo2 = [{"value": "", "label": ""}]
 
@@ -390,7 +391,7 @@ class CommonFilter(View):
                 with connection.cursor() as cursor:
                     cursor.execute(f'''
                     SELECT mo.Chains
-                        FROM MetaOrganization mo
+                         FROM MetaOrganization mo
                         JOIN user_management um ON mo.Organization = um.Organization 
                         WHERE um.Email = '{email}'
                     '''
