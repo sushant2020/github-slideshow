@@ -168,8 +168,11 @@ class MV_Promotions(View):
                                 where_conditions.append(f"((CONVERT(datetime, {column_name}, 5) >= %s AND CONVERT(datetime, {column_name}, 5) <= %s))")
                                 params.extend([from_date, to_date])
                         else:
-                            where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
-                            params.extend(filter_values)
+                            if filter_name == "City" and filter_values==["All"]:
+                                pass
+                            else:
+                                where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
+                                params.extend(filter_values)
                 else:
                     column_name = filter_mappings.get(filter_name)
                     if filters["Competitive_Set"]==[] and column_name =="BrandName":
@@ -204,8 +207,10 @@ class MV_Promotions(View):
                     OFFSET %s ROWS FETCH NEXT %s ROWS ONLY ''',
                     params+ [offset, records_per_page])
 
+
                 user_data = cursor.fetchall()
                 
+
                 
                 if any(filters.values()):
                     # Query to get total count after applying filters
