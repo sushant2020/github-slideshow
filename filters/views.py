@@ -320,7 +320,15 @@ class CommonFilter(View):
         data = json.loads(request.body)
         email = data.get('email', '')
         filters = data.get("filters",{})
+        promo_type = data.get('promo_type', '')
+        
         try:
+            with connection.cursor() as cursor_protein:
+                cursor_protein.execute(
+                    "select DISTINCT SourceType from SourceType st "
+                )
+                filters_protein = cursor_protein.fetchall()
+                result_array_source_type = [{"value": item[0], "label": item[0]} for item in filters_protein]
 
             with connection.cursor() as cursor_protein:
                 cursor_protein.execute(
@@ -350,6 +358,33 @@ class CommonFilter(View):
                                 ''')
                 size = cursor_city.fetchall()
                 size = [{"value": item[0], "label": item[0]} for item in size]
+
+            query = f'''select distinct mpt.PromoType from MeaningfulPromos mp
+                    inner join MetaPromoType mpt
+                    on mpt.PromoTypeId = mp.PromoType
+                    inner join MetaPromoType2 mpt2
+                    on mpt2.PromoType2Id = mp.PromoType2
+                    '''
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                promo_type2 = cursor.fetchall()
+                result = [item[0] for item in promo_type2]
+                result_array_promo = [{"value": str(item), "label": str(item)} for item in result]
+            if promo_type2 != []:
+                query = f'''select distinct  mpt2.PromoType2 from MeaningfulPromos mp
+                        inner join MetaPromoType mpt
+                        on mpt.PromoTypeId = mp.PromoType
+                        inner join MetaPromoType2 mpt2
+                        on mpt2.PromoType2Id = mp.PromoType2
+                        where mpt.PromoType = '{promo_type}' '''
+            
+                with connection.cursor() as cursor:
+                    cursor.execute(query)
+                    promo_type2 = cursor.fetchall()
+                    result = [item[0] for item in promo_type2]
+                    result_array_promo2 = [{"value": str(item), "label": str(item)} for item in result]
+            else:
+                    result_array_promo2 = [{"value": "", "label": ""}]
 
             if filters["Market_Segment"] ==[] and filters["Category"] ==[] and filters["Competitive_Set"] ==[]:
                 with connection.cursor() as cursor:
@@ -434,7 +469,11 @@ class CommonFilter(View):
                     "protein_type": result_array_protein,
                     "channel" : result_array_channel,
                     "city":result_array_city,
-                    "size":size}
+                    "size":size,
+                    "promo_type":result_array_promo,
+                    "promo_type2":result_array_promo2,
+                    "source_type":result_array_source_type
+                    }
 
 
                 return JsonResponse(response_data, status=200)                
@@ -533,7 +572,10 @@ class CommonFilter(View):
                     "protein_type": result_array_protein,
                     "channel" : result_array_channel,
                     "city":result_array_city,
-                    "size":size}
+                    "size":size,
+                    "promo_type":result_array_promo,
+                    "promo_type2":result_array_promo2,
+                    "source_type":result_array_source_type}
 
                     return JsonResponse(response_data, status=200)
 
@@ -618,7 +660,10 @@ class CommonFilter(View):
                     "protein_type": result_array_protein,
                     "channel" : result_array_channel,
                     "city":result_array_city,
-                    "size":size}
+                    "size":size,
+                    "promo_type":result_array_promo,
+                    "promo_type2":result_array_promo2,
+                    "source_type":result_array_source_type}
 
                 return JsonResponse(response_data, status=200)
 
@@ -683,8 +728,13 @@ class CommonFilter(View):
                             "protein_type": result_array_protein,
                             "channel" : result_array_channel,
                             "city":result_array_city,
-                            "size":size}
+                            "size":size,
+                    "promo_type":result_array_promo,
+                    "promo_type2":result_array_promo2,
+                    "source_type":result_array_source_type}
+
                     return JsonResponse(response_data, status=200)
+            
             elif filters["Market_Segment"] ==[] and filters["Competitive_Set"]!=[] and filters["Category"]!=[]:
                 with connection.cursor() as cursor:
                     result_array = [{"value": item, "label": item} for item in filters["Competitive_Set"]]
@@ -749,7 +799,11 @@ class CommonFilter(View):
                     "protein_type": result_array_protein,
                     "channel" : result_array_channel,
                     "city":result_array_city,
-                    "size":size}
+                    "size":size,
+                    "promo_type":result_array_promo,
+                    "promo_type2":result_array_promo2,
+                    "source_type":result_array_source_type}
+
                 return JsonResponse(response_data, status=200)
     
             elif filters["Market_Segment"] !=[] and filters["Competitive_Set"]==[] and filters["Category"]!=[]:
@@ -828,7 +882,10 @@ class CommonFilter(View):
                         "protein_type": result_array_protein,
                         "channel" : result_array_channel,
                         "city":result_array_city,
-                        "size":size
+                        "size":size,
+                        "promo_type":result_array_promo,
+                        "promo_type2":result_array_promo2,
+                        "source_type":result_array_source_type
                                 }
                     return JsonResponse(response_data, status=200)
             elif filters["Market_Segment"] !=[] and filters["Competitive_Set"]!=[] and filters["Category"]==[]:
@@ -912,7 +969,10 @@ class CommonFilter(View):
                         "protein_type": result_array_protein,
                         "channel" : result_array_channel,
                         "city":result_array_city,
-                        "size":size
+                        "size":size,
+                    "promo_type":result_array_promo,
+                    "promo_type2":result_array_promo2,
+                    "source_type":result_array_source_type
                     }
                     return JsonResponse(response_data, status=200)
             
@@ -1003,7 +1063,10 @@ class CommonFilter(View):
                 "protein_type": result_array_protein,
                 "channel" : result_array_channel,
                 "city":result_array_city,
-                "size":size
+                "size":size,
+                    "promo_type":result_array_promo,
+                    "promo_type2":result_array_promo2,
+                    "source_type":result_array_source_type
                 }
                 return JsonResponse(response_data, status=200)
         
