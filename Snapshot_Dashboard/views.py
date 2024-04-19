@@ -108,7 +108,7 @@ class SnapshotRegionAPI(View):
                     {where_clause}
                     {order_by_clause}
                     OFFSET %s ROWS FETCH NEXT %s ROWS ONLY '''
-                #pdb.set_trace()
+            
                 cursor.execute(query,
                     params + [offset, records_per_page])
 

@@ -19,7 +19,7 @@ class Dashboard(View):
             filters = data.get('filters', {})
             variations = {}
             variations_mychain = {}
-            # pdb.set_trace()
+       
             if filters["Timescale"]==[]:
                 from_date = filters["Select_Date"][0]
                 given_date = datetime.strptime(from_date, "%b-%y")
@@ -110,7 +110,7 @@ class Dashboard(View):
                         where vm.AsOfDate in ('{from_date}', '{to_date}')
                         and BrandName in ('{user_data[0]}') 
                         group by AsOfDate,DataType'''
-            #pdb.set_trace()
+
             with connection.cursor() as cursor:
                 cursor.execute(query2)
                 my_dashboard_data = cursor.fetchall()
