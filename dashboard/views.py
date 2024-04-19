@@ -91,10 +91,12 @@ class Dashboard(View):
                             variations[f"absolute_{datatype}"] = str(absolute_variation)
                             variation = ((current_value / prev_value) - 1) * 100
                             variations[datatype] = str(f"{variation:.1f}%")
+                            variations[f"donut_{datatype}"] = str(f"{variation:.1f}").replace('-','')
 
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
                             variations[datatype] = str(f"{variation:.1f}%")
+                            variations[f"donut_{datatype}"] = str(f"{variation:.1f}").replace('-','')
                     else:
                         if datatype == "Product" or datatype == "Promo":
                             absolute_variation = int(current_value)
@@ -103,7 +105,8 @@ class Dashboard(View):
                             variations[datatype] = variation
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
-                            variations_mychain[datatype] = str(f"{variation:.1f}%")
+                            variations[datatype] = str(f"{variation:.1f}%")
+                            variations[f"donut_{datatype}"] = str(f"{variation:.1f}").replace('-','')
            
             # Query and calculate variation for user's chain
             query2 = f'''select AsOfDate,DataType, sum(Value) from dbo.vw_MVDashboard vm
@@ -132,9 +135,11 @@ class Dashboard(View):
                             variations_mychain[f"absolute_{datatype}"] = str(absolute_variation)
                             variation = ((current_value / prev_value) - 1) * 100
                             variations_mychain[datatype] = str(f"{variation:.1f}%")
+                            variations_mychain[f"donut_{datatype}"] = str(f"{variation:.1f}").replace('-','')
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
                             variations_mychain[datatype] = str(f"{variation:.1f}%")
+                            variations_mychain[f"donut_{datatype}"] = str(f"{variation:.1f}").replace('-','')
                     else:
                         if datatype == "Product" or datatype == "Promo":
                             absolute_variation = int(current_value)
@@ -144,6 +149,7 @@ class Dashboard(View):
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
                             variations_mychain[datatype] = str(f"{variation:.1f}%")
+                            variations_mychain[f"donut_{datatype}"] = str(f"{variation:.1f}").replace('-','')
             # Create response data
          
             response_data = {
