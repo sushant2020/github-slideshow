@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import pdb
 import csv
 from django.http import HttpResponse, JsonResponse
+import jwt
 
 SECRET_KEY = 'Razor@0666!!!' 
 ALGORITHM = 'HS256'
@@ -17,6 +18,10 @@ ALGORITHM = 'HS256'
 class SnapshotRegionAPI(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data = json.loads(request.body)
             page_number = data.get('page_number', 1)
             filters = data.get('filters', {})
@@ -132,7 +137,13 @@ class SnapshotRegionAPI(View):
 
                 
                 return JsonResponse(response_data, status=200)
-                
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)     
         except Exception as e:
 
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
@@ -143,6 +154,10 @@ class SnapshotRegionAPI(View):
 class SnapshotChannelAPI(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             # Mapping of filter names to database column names
             filter_mappings = {
                 "Timescale": "FormattedDate",
@@ -252,7 +267,13 @@ class SnapshotChannelAPI(View):
                 "total_count": total_count
             }
             return JsonResponse(response_data, status=200)
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
 
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
 
@@ -263,6 +284,10 @@ class SnapshotChannelAPI(View):
 class SnapshotVariationAPI(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             last_month = (datetime.today().replace(day=1) - timedelta(days=1)).strftime('%b-%y')
             print(last_month)
 
@@ -367,5 +392,12 @@ class SnapshotVariationAPI(View):
             }
 
             return JsonResponse(response_data, status=200)
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)

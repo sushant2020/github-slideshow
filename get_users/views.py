@@ -5,12 +5,20 @@ from django.utils.decorators import method_decorator
 from django.views import View
 import json
 from django.db import connection
+import jwt
+
+SECRET_KEY = 'Razor@0666!!!'  
+ALGORITHM = 'HS256'
 
 # Create your views here.
 @method_decorator(csrf_exempt, name='dispatch')
 class GetUserAPI(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data = json.loads(request.body)
             board_type = data.get('board_type', '')
             page_number = data.get('page_number',1)
@@ -78,7 +86,13 @@ class GetUserAPI(View):
                     "total_count":total_count
                 }    
                 return JsonResponse(response_data, status=200) 
-                    
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)           
         except Exception as e:
             # Handle other exceptions
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
@@ -88,6 +102,10 @@ class GetUserAPI(View):
 class GetUserProfileAPI(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data = json.loads(request.body)
             email = data.get("email",'')
             with connection.cursor() as cursor: 
@@ -104,7 +122,13 @@ class GetUserProfileAPI(View):
                     "data": result,
                 }
             return JsonResponse(response_data, status=200)
-                
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)        
         except Exception as e:
 
             return JsonResponse({'success': False, 'message': str(e)}, status=500)

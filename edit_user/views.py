@@ -1,7 +1,4 @@
 from django.shortcuts import render
-
-# Create your views here.
-
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -13,12 +10,20 @@ from django.db import connection
 from password_generator import PasswordGenerator
 from django.urls import get_resolver
 import pdb
+import jwt
+
+SECRET_KEY = 'Razor@0666!!!'  
+ALGORITHM = 'HS256'
 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class EditUserAPI(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data = json.loads(request.body)
             
             updates = []
@@ -54,6 +59,12 @@ class EditUserAPI(View):
                 return JsonResponse(response_data, status=200)
             else:
                 return JsonResponse({'success': False, 'message': "No valid data provided for update"}, status=400)
-        
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as e:
             return JsonResponse({'success': False, 'message': f"Unable to edit user's info: {str(e)}"}, status=500)

@@ -10,6 +10,10 @@ from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 import pdb
 from django.views.decorators.cache import cache_page
+import jwt
+
+SECRET_KEY = 'Razor@0666!!!'  
+ALGORITHM = 'HS256'
 
 
 def extract_year_month(date_str):
@@ -23,6 +27,10 @@ def extract_month(date_str):
 class Trends_API(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data = json.loads(request.body)
             page_number = data.get('page_number', 1)
             filters = data.get('filters', {})
@@ -136,7 +144,8 @@ class Trends_API(View):
                             category = row[2]
                             PriceSegment = row[5]
                             Size = row[6]
-                            price = row[3]
+                            
+                            price = f"{row[3]:.2f}"
                             ProteinType = row[7]
                             formatted_date = row[4]
                             grouped_data[(product, brand, category,PriceSegment,Size,ProteinType)][formatted_date] = price
@@ -307,7 +316,7 @@ class Trends_API(View):
                         sorted_months.insert(0,"Item")
                         sorted_months.insert(1,"Brand")
                         sorted_months.insert(2,"Category")
-                        sorted_months.insert(3,"Price_range")
+                        
                         response_data = {
                             "success": True,
                             "data": result,
@@ -548,9 +557,10 @@ class Trends_API(View):
                             brand = row[0]
                             category = row[1]
                             ProteinType = row[2] 
-                            price = row[3]
+                     
+                            price =  f"{row[3]:.2f}"
                             formatted_date = row[4]
-                            grouped_data[(brand, category,ProteinType)][formatted_date] = round(price,2)
+                            grouped_data[(brand, category,ProteinType)][formatted_date] = price
                             # Extract month from the formatted_date and add it to the set
                             month = formatted_date[:6]  # Extract month-year string
                             all_months.add(month)
@@ -872,7 +882,13 @@ class Trends_API(View):
 
                         return JsonResponse(response_data, status=200)
 
-                
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)       
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
         

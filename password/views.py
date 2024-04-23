@@ -22,6 +22,10 @@ class UpdatetePasswordrAPI(View):
     def post(self, request, *args, **kwargs):
         try:
             # Get data from the frontend
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data = json.loads(request.body)
             email = data.get('email', '')
             new_password = data.get('new_password','')
@@ -55,7 +59,13 @@ class UpdatetePasswordrAPI(View):
 
             return JsonResponse(response_data, status=200)
             
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
 
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as e:
             # Handle other exceptions
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
@@ -65,6 +75,10 @@ class ForgotPasswordAPI(View):
     def post(self, request, *args, **kwargs):
         try:
             # Get data from the frontend
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data = json.loads(request.body)
             email = data.get('email', '')
             new_password = data.get('new_password','')
@@ -91,7 +105,13 @@ class ForgotPasswordAPI(View):
 
             return JsonResponse(response_data, status=200)
             
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
 
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as e:
             # Handle other exceptions
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
@@ -102,6 +122,10 @@ class ForgotPasswordRedirectAPI(View):
     def post(self, request, *args, **kwargs):
         try:
             # Get data from the frontend
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data = json.loads(request.body)
             email = data.get('email', '')
             query = f"select * from user_management where email = '{email}' and IsActive = 1"
@@ -114,7 +138,13 @@ class ForgotPasswordRedirectAPI(View):
             else:
                 response_data = {"success":False,"data":"Email doesn't exist","message":"Please enter correct email"}
                 return JsonResponse(response_data, status=500)
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
 
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as e:
             # Handle other exceptions
             return JsonResponse({'success': False, 'message': str(e)}, status=500)

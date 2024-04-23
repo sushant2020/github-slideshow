@@ -36,6 +36,10 @@ ALGORITHM = 'HS256'
 class CreateUserAPI(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             # Get data from the frontend
             data = json.loads(request.body)
             first_name = data.get('first_name', '')
@@ -108,6 +112,13 @@ class CreateUserAPI(View):
             }
 
             return JsonResponse(response_data, status=200)
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
 
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
+        
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
