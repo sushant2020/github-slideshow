@@ -279,7 +279,9 @@ class Trends_API(View):
                             all_months.add(month)
 
                         # Convert set of months to a sorted list
+                        
                         sorted_months = sorted(all_months, key=extract_month)
+                        sorted_months.pop(0)
                         total_count = len(grouped_data)
                         start_index = (page_number - 1) * records_per_page
                         end_index = min(start_index + records_per_page, total_count)
