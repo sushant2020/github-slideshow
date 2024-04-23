@@ -222,7 +222,7 @@ class TrendsExport(View):
                                 else:
                                     where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
                                     params.extend(filter_values)
-                    #
+                    
                         else:
                             column_name = filter_mappings.get(filter_name)
                             if filters["Competitive_Set"]==[] and column_name =="Brand":
