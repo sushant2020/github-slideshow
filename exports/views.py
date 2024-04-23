@@ -11,7 +11,10 @@ from django.http import HttpResponse, JsonResponse
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
+import jwt
 
+SECRET_KEY = 'Razor@0666!!!'  
+ALGORITHM = 'HS256'
 # Create your views here.
 
 def extract_year_month(date_str):
@@ -25,6 +28,10 @@ def extract_month(date_str):
 class SnapshotRegionExport(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data = json.loads(request.body)
             filters = data.get('filters', {})
             sort_column = data.get('sort_column')
@@ -151,7 +158,13 @@ class SnapshotRegionExport(View):
                     "data": result
                 }
                 return JsonResponse(response_data, status=200)
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
 
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
         
@@ -161,6 +174,10 @@ class SnapshotRegionExport(View):
 class TrendsExport(View): 
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data = json.loads(request.body)
             filters = data.get('filters', {})
             sort_column = data.get('sort_column')
@@ -903,7 +920,13 @@ class TrendsExport(View):
 
                         return JsonResponse(response_data, status=200)
 
-                
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)      
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
 

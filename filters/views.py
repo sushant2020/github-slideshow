@@ -7,6 +7,7 @@ import pdb
 from django.http import JsonResponse
 import json
 from calendar import month_abbr
+import jwt
 
 SECRET_KEY = 'Razor@0666!!!'  
 ALGORITHM = 'HS256'
@@ -26,6 +27,10 @@ def custom_sort(item):
 class Timescalefitler(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data =json.loads(request.body)
             dashboard_type = data.get('dashboard_type')
             main_dashboard = data.get("main_dashboard")
@@ -234,7 +239,13 @@ class Timescalefitler(View):
                             "message": "Filter value fetched successfully"
                         }
                         return JsonResponse(response_data, status=200)
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
 
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as err:
             return JsonResponse({'success': False, 'message': str(err)}, status=500)
         
@@ -242,6 +253,10 @@ class Timescalefitler(View):
 class InitialTimescalefilter(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data =json.loads(request.body)
             dashboard_type = data.get('dashboard_type')
             if dashboard_type == "Region":
@@ -269,6 +284,13 @@ class InitialTimescalefilter(View):
                     "date": date_array
                 }
                 return JsonResponse(response_data, status=200)
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
 
@@ -277,6 +299,10 @@ class InitialTimescalefilter(View):
 class OrganizationDropdown(View):
     def get(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             with connection.cursor() as cursor_competitive:
                 cursor_competitive.execute(
                     "SELECT DISTINCT BrandName FROM Brands b"
@@ -288,7 +314,13 @@ class OrganizationDropdown(View):
                     "Brand": result_array_competitive_set
                 }
                 return JsonResponse(response_data, status=200)
-        
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as err:
             return JsonResponse({'success': False, 'message': str(err)}, status=500)                
 
@@ -297,6 +329,10 @@ class OrganizationDropdown(View):
 class UserOrganizationDropdown(View):
     def get(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             with connection.cursor() as cursor_competitive:
                 cursor_competitive.execute(
                     "select DISTINCT Organization from MetaOrganization mo "
@@ -308,7 +344,13 @@ class UserOrganizationDropdown(View):
                     "Brand": result_array_competitive_set
                 }
                 return JsonResponse(response_data, status=200)
-        
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as err:
             return JsonResponse({'success': False, 'message': str(err)}, status=500)                
 
@@ -317,6 +359,10 @@ class UserOrganizationDropdown(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class CommonFilter(View):
     def post(self, request, *args, **kwargs):
+        # header_dict = request.headers
+        # token = header_dict["Authorization"].replace('Bearer ','') 
+        
+        # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         data = json.loads(request.body)
         email = data.get('email', '')
         filters = data.get("filters",{})
@@ -1070,7 +1116,13 @@ class CommonFilter(View):
                     "source_type":result_array_source_type
                 }
                 return JsonResponse(response_data, status=200)
-        
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as err:
             return JsonResponse({'success': False, 'message': str(err)}, status=500)
 
@@ -1079,6 +1131,10 @@ class CommonFilter(View):
 class Competitive_SetAPI(View):
  def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data = json.loads(request.body)
             email = data.get('email', '')
             segments = data.get("segments",'')
@@ -1121,15 +1177,25 @@ class Competitive_SetAPI(View):
                     "brand": main_result_array, 
                     }
             return JsonResponse(response_data, status=200) 
-        except Exception as e:
-            
+        
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
 
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
+        except Exception as e:   
             return JsonResponse({'success': False, 'message': str(e)}, status=500)     
 
 @method_decorator(csrf_exempt, name='dispatch')
 class Brand_SegmentFilterAPI(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data = json.loads(request.body)
             email = data.get('email', '')
             initial_load = data.get("initial_load",'')
@@ -1486,15 +1552,24 @@ class Brand_SegmentFilterAPI(View):
                     }
 
                 return JsonResponse(response_data, status=200)
-        except Exception as e:
-            
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
 
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
+        except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)     
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ItemFilterAPI(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data = json.loads(request.body)
             email = data.get('email', '')
             initial_load = data.get("initial_load",'')
@@ -1557,6 +1632,13 @@ class ItemFilterAPI(View):
                             "item": item_result_array,
                         }
                     return JsonResponse(response_data, status=200)
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)     
         
@@ -1566,6 +1648,10 @@ class ItemFilterAPI(View):
 class PromoTypeFilter(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data = json.loads(request.body)
             promo_type = data.get('promo_type', '')
             query = f'''select distinct  mpt2.PromoType2 from MeaningfulPromos mp
@@ -1585,6 +1671,13 @@ class PromoTypeFilter(View):
                         "item": result_array,
                     }
                 return JsonResponse(response_data, status=200)
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as err:
             return JsonResponse({'success': False, 'message': str(err)}, status=500)  
 
@@ -1593,6 +1686,11 @@ class PromoTypeFilter(View):
 class PromoFilter(View):
     def get(self, request, *args, **kwargs):
         try:
+        #    header_dict = request.headers
+        #    token = header_dict["Authorization"].replace('Bearer ','') 
+           
+        #    decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+           
            query = f'''select distinct mpt.PromoType from MeaningfulPromos mp
                     inner join MetaPromoType mpt
                     on mpt.PromoTypeId = mp.PromoType
@@ -1609,5 +1707,13 @@ class PromoFilter(View):
                         "item": result_array,
                     }
                 return JsonResponse(response_data, status=200)
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
+        
         except Exception as err:
             return JsonResponse({'success': False, 'message': str(err)}, status=500)  

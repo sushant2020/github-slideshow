@@ -9,6 +9,10 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.http import JsonResponse
 import pdb
+import jwt
+
+SECRET_KEY = 'Razor@0666!!!'  
+ALGORITHM = 'HS256'
 
 @method_decorator(csrf_exempt,name='dispatch')
 class Dashboard(View):
@@ -47,14 +51,14 @@ class Dashboard(View):
                 ''')
                 user_data = cursor.fetchone()
                 cursor.execute(f'''
-                                                SELECT mo.Chains
-                                                    FROM MetaOrganization mo
-                                                    JOIN user_management um ON mo.Organization = um.Organization 
-                                                    WHERE um.Email = '{email}'
-                                                ''',
-                                                )
+                    SELECT mo.Chains
+                    FROM MetaOrganization mo
+                    JOIN user_management um ON mo.Organization = um.Organization 
+                    WHERE um.Email = '{email}'
+                ''')
                 user_chain_data = cursor.fetchall()
                 user_data_list = [brand.strip() for brand in user_chain_data[0][0].split(',')]
+
             if len(filters["Competitive_Set"]) > 1:
                 query = f'''select AsOfDate,DataType, sum(Value) from dbo.vw_MVDashboard vm
                             where vm.AsOfDate in ('{from_date}', '{to_date}')
@@ -79,20 +83,19 @@ class Dashboard(View):
                 dashboard_data = cursor.fetchall()
 
             data_dict = {(month, datatype): value for month, datatype, value in dashboard_data}
-          
+
             # Calculate variation for competitive set
             for (current_month, datatype), current_value in data_dict.items():
                 if current_month == from_date:
                     prev_month = to_date
                     prev_value = data_dict.get((prev_month, datatype))
-                    if prev_value is not None:
+                    if prev_value is not None and prev_value != 0:
                         if datatype == "Product" or datatype == "Promo":
                             absolute_variation = int(current_value - prev_value)
                             variations[f"absolute_{datatype}"] = str(absolute_variation)
                             variation = ((current_value / prev_value) - 1) * 100
                             variations[datatype] = str(f"{variation:.1f}%")
                             variations[f"donut_{datatype}"] = str(f"{variation:.1f}")
-
                         else:
                             variation = ((current_value / prev_value) - 1) * 100
                             variations[datatype] = str(f"{variation:.1f}%")
@@ -101,13 +104,10 @@ class Dashboard(View):
                         if datatype == "Product" or datatype == "Promo":
                             absolute_variation = int(current_value)
                             variations[f"absolute_{datatype}"] = str(absolute_variation)
-                            variation = "0"
-                            variations[datatype] = variation
+                            variations[datatype] = "0.0%"
                         else:
-                            variation = ((current_value / prev_value) - 1) * 100
-                            variations[datatype] = str(f"{variation:.1f}%")
-                            variations[f"donut_{datatype}"] = str(f"{variation:.1f}")
-           
+                            variations[datatype] = "0.0%"
+
             # Query and calculate variation for user's chain
             query2 = f'''select AsOfDate,DataType, sum(Value) from dbo.vw_MVDashboard vm
                         where vm.AsOfDate in ('{from_date}', '{to_date}')
@@ -129,7 +129,7 @@ class Dashboard(View):
                 if current_month == from_date:
                     prev_month = to_date
                     prev_value = my_data_dict.get((prev_month, datatype))
-                    if prev_value is not None:
+                    if prev_value is not None and prev_value != 0:
                         if datatype == "Product" or datatype == "Promo":
                             absolute_variation = int(current_value - prev_value)
                             variations_mychain[f"absolute_{datatype}"] = str(absolute_variation)
@@ -144,18 +144,15 @@ class Dashboard(View):
                         if datatype == "Product" or datatype == "Promo":
                             absolute_variation = int(current_value)
                             variations_mychain[f"absolute_{datatype}"] = str(absolute_variation)
-                            #variation = 0
-                            variations_mychain[datatype] = "0"
+                            variations_mychain[datatype] = "0.0%"
                         else:
-                            variation = ((current_value / prev_value) - 1) * 100
-                            variations_mychain[datatype] = str(f"{variation:.1f}%")
-                            variations_mychain[f"donut_{datatype}"] = str(f"{variation:.1f}")
+                            variations_mychain[datatype] = "0.0%"
+
             # Create response data
-         
             response_data = {
                 "success": True,
                 "data": variations,
-                "my_data": variations_mychain #{datatype: "-" for datatype in variations} if not my_data_dict else variations_mychain
+                "my_data": variations_mychain
             }
 
             return JsonResponse(response_data, status=200)

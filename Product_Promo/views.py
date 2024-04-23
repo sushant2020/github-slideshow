@@ -10,12 +10,20 @@ from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 import pdb
 from django.views.decorators.cache import cache_page
+import jwt
+
+SECRET_KEY = 'Razor@0666!!!'  
+ALGORITHM = 'HS256'
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class MV_Products(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
             
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             where_conditions = []
             params = []
             data = json.loads(request.body)
@@ -121,6 +129,13 @@ class MV_Products(View):
                     "total_count": total_count
                 }
             return JsonResponse(response_data, status=200)
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
         
@@ -130,6 +145,10 @@ class MV_Products(View):
 class MV_Promotions(View):
     def post(self,request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             where_conditions = []
             params = []
             data = json.loads(request.body)
@@ -147,8 +166,8 @@ class MV_Promotions(View):
                         "City":"City",
                         "Source_Type":"ChannelName",
                         "Category": "Category",
-                        "PromoType": "PromoType",
-                        "PromoType2":"PromoType2",
+                        "Promo_Type": "PromoType",
+                        "Promo_Type2":"PromoType2",
                         "BrandName":"BrandName",
                         "Title":"Title",
                         "Chain":"BrandName",
@@ -197,7 +216,7 @@ class MV_Promotions(View):
             order_by_clause = ''
             if sort_column and sort_type:
                 order_by_clause = f"ORDER BY {filter_mappings[sort_column]} {sort_type}"
-
+  
             with connection.cursor() as cursor:
                 cursor.execute(f'''
                     SELECT BrandName, Title, PromoType, PromoType2, Category, Description, ImageUrl
@@ -234,5 +253,12 @@ class MV_Promotions(View):
                     "total_count": total_count
                 }
             return JsonResponse(response_data, status=200)
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)

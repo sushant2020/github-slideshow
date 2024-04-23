@@ -24,6 +24,11 @@ ALGORITHM = 'HS256'
 class AddOrganization(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
             data = json.loads(request.body)
             organization = data.get('organization', '')
             chains = data.get('chains','')
@@ -54,7 +59,13 @@ class AddOrganization(View):
                 }
 
                 return JsonResponse(response_data, status=200)
-                
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)   
         except Exception as e:
 
             return JsonResponse({'success': False, 'error': str(e), 'message':'Failed to add organization'}, status=500)  
@@ -63,6 +74,10 @@ class AddOrganization(View):
 class EditOrganization(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data = json.loads(request.body)
             organization = data.get('organization', '')
             chains = data.get('chains','')
@@ -129,7 +144,13 @@ class EditOrganization(View):
                     return JsonResponse(response_data, status=200)
 
 
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
 
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as e:
 
             return JsonResponse({'success': False, 'error': str(e), 'message':'Failed to add organization'}, status=500)  
@@ -138,6 +159,10 @@ class EditOrganization(View):
 class DeleteOrganization(View):
     def post(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data = json.loads(request.body)
             organization = data.get('organization', '')
             with connection.cursor() as cursor:
@@ -166,6 +191,13 @@ class DeleteOrganization(View):
                     }
 
                     return JsonResponse(response_data, status=200)
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as e:
 
             return JsonResponse({'success': False, 'error': str(e), 'message':'Failed to delete organization'}, status=500)  
@@ -174,6 +206,10 @@ class DeleteOrganization(View):
 class CommonOrganizationDropdown(View):
     def get(self, request, *args, **kwargs):
         try:
+            # header_dict = request.headers
+            # token = header_dict["Authorization"].replace('Bearer ','') 
+            
+            # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             with connection.cursor() as cursor_competitive:
                 cursor_competitive.execute(
                     "SELECT DISTINCT BrandName FROM Brands b"
@@ -202,5 +238,12 @@ class CommonOrganizationDropdown(View):
                     "country" : result_array_country
                 }
                 return JsonResponse(response_data, status=200)
+        # except jwt.ExpiredSignatureError:
+        #     # Token has expired
+        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
+
+        # except jwt.InvalidTokenError:
+        #     # Invalid token
+        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as err:
             return JsonResponse({'success': False, 'message': str(err)}, status=500)
