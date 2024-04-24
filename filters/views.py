@@ -33,219 +33,54 @@ class Timescalefitler(View):
             # decoded_data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             data =json.loads(request.body)
             dashboard_type = data.get('dashboard_type')
-            main_dashboard = data.get("main_dashboard")
-            email = data.get("email")
+            
 
-            if main_dashboard == 'Snapshot':
-                if dashboard_type == "Region":
-                    with connection.cursor() as cursor:
-                        cursor.execute(
-                            "SELECT DISTINCT FormattedDate FROM SnapshotByRegionView;"
-                        )
-                        filters = cursor.fetchall()
-                        result_array = [{"value": item[0], "label": item[0]} for item in filters]
-                        result_array = sorted(result_array, key=custom_sort)
+            if dashboard_type == "Region":
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        "SELECT DISTINCT FormattedDate FROM SnapshotByRegionView;"
+                    )
+                    filters = cursor.fetchall()
+                    result_array = [{"value": item[0], "label": item[0]} for item in filters]
+                    result_array = sorted(result_array, key=custom_sort)
                     
-                    with connection.cursor() as cursor:
-                        cursor.execute(f'''
-                        SELECT mo.Chains
-                            FROM MetaOrganization mo
-                            JOIN user_management um ON mo.Organization = um.Organization 
-                            WHERE um.Email = '{email}'
-                        ''',
-                        )
+                    response_data = {
+                        "success": "true",
+                        "filters": result_array,
+                        "message": "Filter value fetched successfully"
+                    }
+                    return JsonResponse(response_data, status=200)
+                
+            elif dashboard_type == 'Channel':
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        "SELECT DISTINCT FormattedDate FROM SnapshotByChannelView;"
+                    )
+                    filters = cursor.fetchall()
+                    result_array = [{"value": item[0], "label": item[0]} for item in filters]
+                    result_array = sorted(result_array, key=custom_sort)
 
-                        user_data = cursor.fetchall()
-                        user_data_list = user_data[0][0].split(',')
-                        cursor.execute(
-                            f"SELECT DISTINCT Product FROM SnapshotByRegionView where Brand in {tuple(user_data_list)};"
-                        )
-                        filter_item = cursor.fetchall()
-                        result_item_array = [{"value": item[0], "label": item[0]} for item in filter_item]    
-                        result_item_array = sorted(result_item_array, key=custom_sort_item)
-                        response_data = {
-                            "success": "true",
-                            "filters": result_array,
-                            "item_filter": result_item_array,
-                            "message": "Filter value fetched successfully"
-                        }
-                        return JsonResponse(response_data, status=200)
-                    
-                elif dashboard_type == 'Channel':
-                    with connection.cursor() as cursor:
-                        cursor.execute(
-                            "SELECT DISTINCT FormattedDate FROM SnapshotByChannelView;"
-                        )
-                        filters = cursor.fetchall()
-                        result_array = [{"value": item[0], "label": item[0]} for item in filters]
-                        result_array = sorted(result_array, key=custom_sort)
-
-                    with connection.cursor() as cursor:
-                        cursor.execute(f'''
-                        SELECT mo.Chains
-                            FROM MetaOrganization mo
-                            JOIN user_management um ON mo.Organization = um.Organization 
-                            WHERE um.Email = '{email}'
-                        ''',
-                        )
-                        user_data = cursor.fetchall()
-                        user_data_list = user_data[0][0].split(',')
-                        cursor.execute(
-                            f"SELECT DISTINCT Product FROM SnapshotByChannelView where Brand in {tuple(user_data_list)};"
-                        )
-                        filter_item = cursor.fetchall()
-                        result_item_array = [{"value": item[0], "label": item[0]} for item in filter_item]    
-                        result_item_array = sorted(result_item_array, key=custom_sort_item)
-                        response_data = {
-                            "success": "true",
-                            "filters": result_array,
-                            "item_filter": result_item_array,
-                            "message": "Filter value fetched successfully"
-                        }
-                        return JsonResponse(response_data, status=200)
-                    
-                elif dashboard_type =='Variation':
-                    with connection.cursor() as cursor:
-                        cursor.execute(
-                            "SELECT DISTINCT FormattedDate FROM SnapshotByVariation;"
-                        )
-                        filters = cursor.fetchall()
-                        result_array = [{"value": item[0], "label": item[0]} for item in filters]
-                        result_array = sorted(result_array, key=custom_sort)
-                    
-                    with connection.cursor() as cursor:
-                        cursor.execute(f'''
-                        SELECT mo.Chains
-                            FROM MetaOrganization mo
-                            JOIN user_management um ON mo.Organization = um.Organization 
-                            WHERE um.Email = '{email}'
-                        ''',
-                        )
-
-                        user_data = cursor.fetchall()
-                        user_data_list = user_data[0][0].split(',')
-                        cursor.execute(
-                            f"SELECT DISTINCT Product FROM SnapshotByVariation where Brand in {tuple(user_data_list)};"
-                        )
-                        filter_item = cursor.fetchall()
-                        result_item_array = [{"value": item[0], "label": item[0]} for item in filter_item]    
-                        result_item_array = sorted(result_item_array, key=custom_sort_item)
-                        response_data = {
-                            "success": "true",
-                            "filters": result_array,
-                            "item_filter": result_item_array,
-                            "message": "Filter value fetched successfully"
-                        }
-                        return JsonResponse(response_data, status=200)
-            else:
-                if dashboard_type == "Region":
-                    with connection.cursor() as cursor:
-                        cursor.execute(
-                            "SELECT DISTINCT FormattedDate FROM SnapshotByRegionView;"
-                        )
-                        filters = cursor.fetchall()
-                        result_array = [{"value": item[0], "label": item[0]} for item in filters]
-                        result_array = sorted(result_array, key=custom_sort)
-                    
-                    with connection.cursor() as cursor:
-                        cursor.execute(f'''
-                        SELECT mo.Chains
-                            FROM MetaOrganization mo
-                            JOIN user_management um ON mo.Organization = um.Organization 
-                            WHERE um.Email = '{email}'
-                        ''',
-                        )
-
-                        user_data = cursor.fetchall()
-                        user_data_list = user_data[0][0].split(',')
-                        cursor.execute(
-                            f"SELECT DISTINCT Product FROM SnapshotByRegionView where Brand in {tuple(user_data_list)};"
-                        )
-                        filter_item = cursor.fetchall()
-                        result_item_array = [{"value": item[0], "label": item[0]} for item in filter_item]    
-                        result_item_array = sorted(result_item_array, key=custom_sort_item)
-                        response_data = {
-                            "success": "true",
-                            "filters": result_array,
-                            "item_filter": result_item_array,
-                            "message": "Filter value fetched successfully"
-                        }
-                        return JsonResponse(response_data, status=200)
-                    
-                elif dashboard_type == 'Channel':
-                    with connection.cursor() as cursor:
-                        cursor.execute(
-                            "SELECT DISTINCT FormattedDate FROM SnapshotByChannelView;"
-                        )
-                        filters = cursor.fetchall()
-                        result_array = [{"value": item[0], "label": item[0]} for item in filters]
-                        result_array = sorted(result_array, key=custom_sort)
-
-                    with connection.cursor() as cursor:
-                        cursor.execute(f'''
-                        SELECT mo.Chains
-                            FROM MetaOrganization mo
-                            JOIN user_management um ON mo.Organization = um.Organization 
-                            WHERE um.Email = '{email}'
-                        ''',
-                        )
-
-                        user_data = cursor.fetchall()
-                        user_data_list = user_data[0][0].split(',')
-                        cursor.execute(
-                            f"SELECT DISTINCT Product FROM SnapshotByChannelView where Brand in {tuple(user_data_list)};"
-                        )
-                        filter_item = cursor.fetchall()
-                        result_item_array = [{"value": item[0], "label": item[0]} for item in filter_item]    
-                        result_item_array = sorted(result_item_array, key=custom_sort_item)
-                        response_data = {
-                            "success": "true",
-                            "filters": result_array,
-                            "item_filter": result_item_array,
-                            "message": "Filter value fetched successfully"
-                        }
-                        return JsonResponse(response_data, status=200)
-                    
-                elif dashboard_type =='Variation':
-                    with connection.cursor() as cursor:
-                        cursor.execute(
-                            "SELECT DISTINCT FormattedDate FROM SnapshotByVariation;"
-                        )
-                        filters = cursor.fetchall()
-                        result_array = [{"value": item[0], "label": item[0]} for item in filters]
-                        result_array = sorted(result_array, key=custom_sort)
-                    
-                    with connection.cursor() as cursor:
-                        cursor.execute(f'''
-                        SELECT mo.Chains
-                            FROM MetaOrganization mo
-                            JOIN user_management um ON mo.Organization = um.Organization 
-                            WHERE um.Email = '{email}'
-                        ''',
-                        )
-
-                        user_data = cursor.fetchall()
-                        user_data_list = user_data[0][0].split(',')
-                        cursor.execute(
-                            f"SELECT DISTINCT Product FROM SnapshotByVariation where Brand in {tuple(user_data_list)};"
-                        )
-                        filter_item = cursor.fetchall()
-                        result_item_array = [{"value": item[0], "label": item[0]} for item in filter_item]    
-                        result_item_array = sorted(result_item_array, key=custom_sort_item)
-                        response_data = {
-                            "success": "true",
-                            "filters": result_array,
-                            "item_filter": result_item_array,
-                            "message": "Filter value fetched successfully"
-                        }
-                        return JsonResponse(response_data, status=200)
-        # except jwt.ExpiredSignatureError:
-        #     # Token has expired
-        #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
-
-        # except jwt.InvalidTokenError:
-        #     # Invalid token
-        #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
+                    response_data = {
+                        "success": "true",
+                        "filters": result_array,
+                        "message": "Filter value fetched successfully"
+                    }
+                    return JsonResponse(response_data, status=200)
+                
+            elif dashboard_type =='Variation':
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        "SELECT DISTINCT FormattedDate FROM SnapshotByVariation;"
+                    )
+                    filters = cursor.fetchall()
+                    result_array = [{"value": item[0], "label": item[0]} for item in filters]
+                    result_array = sorted(result_array, key=custom_sort)
+                    response_data = {
+                        "success": "true",
+                        "filters": result_array,
+                        "message": "Filter value fetched successfully"
+                    }
+                    return JsonResponse(response_data, status=200)
         except Exception as err:
             return JsonResponse({'success': False, 'message': str(err)}, status=500)
         

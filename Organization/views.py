@@ -175,12 +175,10 @@ class DeleteOrganization(View):
                         WHERE Organization = '{organization}'
                         ''',
                         )
-                    cursor.execute(f''' select Email from user_management where Organization = '{organization}' ''')
-                    user_email = cursor.fetchall()
-                    result_tuple = tuple(item[0] for item in user_email)
+                    
                     query = f'''UPDATE user_management
                         SET IsActive = 0
-                        WHERE Email in {result_tuple};
+                        WHERE Organization = '{organization}';
                     ''' 
                     
                     cursor.execute(query)

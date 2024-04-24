@@ -281,7 +281,7 @@ class Trends_API(View):
                         # Convert set of months to a sorted list
                         
                         sorted_months = sorted(all_months, key=extract_month)
-                        sorted_months.pop(0)
+                        
                         total_count = len(grouped_data)
                         start_index = (page_number - 1) * records_per_page
                         end_index = min(start_index + records_per_page, total_count)
@@ -314,7 +314,7 @@ class Trends_API(View):
                                     # # If data for a month is missing, set variation to None
                                     # variation_key = f"variation_{prev_month_key}-{month}"
                                     # item[variation_key] = None
-                            
+                        sorted_months.pop(0)  
                         sorted_months.insert(0,"Item")
                         sorted_months.insert(1,"Brand")
                         sorted_months.insert(2,"Category")
