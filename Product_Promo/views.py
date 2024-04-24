@@ -59,14 +59,15 @@ class MV_Products(View):
                                 from_date = datetime.strptime(filter_values[0].strip(), "%Y-%m-%d")
                                 to_date = datetime.strptime(filter_values[1].strip(), "%Y-%m-%d")
                                 if dashboard_type ==1:
-    
+                                                            #StartDate >= '2024-01-01' AND StartDate <=2024-31-01 AND'EndDate > ='2024-01-01
                                 #from_date = (from_date - relativedelta(months=1)).strftime("%Y-%m-%d")  # Adjust to previous month
-                                    where_conditions.append(f"((CONVERT(datetime, {column_name}, 5) > %s AND CONVERT(datetime, {column_name}, 5) < %s))")
-                                    params.extend([from_date, to_date])
+                                    where_conditions.append(f"((CONVERT(datetime, {column_name}, 5) >= %s AND CONVERT(datetime, {column_name}, 5) <= %s) AND CONVERT(datetime, Enddate, 5) >= %s)")
+                                    params.extend([from_date, to_date, from_date])
                                 else:
+                                    #StartDate <= '2024-31-01' AND EndDate >= '2024-01-01'
                                #from_date = (from_date - relativedelta(months=1)).strftime("%Y-%m-%d")  # Adjust to previous month
-                                    where_conditions.append(f"((CONVERT(datetime, Enddate, 5) > %s AND CONVERT(datetime, {column_name}, 5) < %s))")
-                                    params.extend([to_date, to_date])
+                                    where_conditions.append(f"((CONVERT(datetime, {column_name}, 5) <= %s AND CONVERT(datetime, Enddate, 5) >= %s))")
+                                    params.extend([to_date, from_date])
                         else:
                             where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
                             params.extend(filter_values)  
@@ -164,7 +165,7 @@ class MV_Promotions(View):
                         "Market_Segment": "Segments",
                         "Competitive_Set": "BrandName",
                         "City":"City",
-                        "Source_Type":"ChannelName",
+                        "Source_Type":"SourceType",
                         "Category": "Category",
                         "Promo_Type": "PromoType",
                         "Promo_Type2":"PromoType2",
@@ -184,8 +185,8 @@ class MV_Promotions(View):
                                 from_date = datetime.strptime(filter_values[0].strip(), "%Y-%m-%d")
                                 to_date = datetime.strptime(filter_values[1].strip(), "%Y-%m-%d")
                                 from_date = (from_date - relativedelta(months=1)).strftime("%Y-%m-%d")  # Adjust to previous month
-                                where_conditions.append(f"((CONVERT(datetime, {column_name}, 5) >= %s AND CONVERT(datetime, {column_name}, 5) <= %s))")
-                                params.extend([from_date, to_date])
+                                where_conditions.append(f"((CONVERT(datetime, {column_name}, 5) <= %s AND CONVERT(datetime, Enddate, 5) >= %s))")
+                                params.extend([to_date,from_date])
                         else:
                             if filter_name == "City" and filter_values==["All"]:
                                 pass
@@ -216,7 +217,7 @@ class MV_Promotions(View):
             order_by_clause = ''
             if sort_column and sort_type:
                 order_by_clause = f"ORDER BY {filter_mappings[sort_column]} {sort_type}"
-  
+            
             with connection.cursor() as cursor:
                 cursor.execute(f'''
                     SELECT BrandName, Title, PromoType, PromoType2, Category, Description, ImageUrl
