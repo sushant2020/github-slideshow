@@ -184,7 +184,7 @@ class MV_Promotions(View):
                                 # Handle range of dates
                                 from_date = datetime.strptime(filter_values[0].strip(), "%Y-%m-%d")
                                 to_date = datetime.strptime(filter_values[1].strip(), "%Y-%m-%d")
-                                from_date = (from_date - relativedelta(months=1)).strftime("%Y-%m-%d")  # Adjust to previous month
+                                #from_date = (from_date - relativedelta(months=1)).strftime("%Y-%m-%d")  # Adjust to previous month
                                 where_conditions.append(f"((CONVERT(datetime, {column_name}, 5) <= %s AND CONVERT(datetime, Enddate, 5) >= %s))")
                                 params.extend([to_date,from_date])
                         else:
