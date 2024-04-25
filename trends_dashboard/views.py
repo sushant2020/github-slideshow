@@ -316,7 +316,9 @@ class Trends_API(View):
                                     # variation_key = f"variation_{prev_month_key}-{month}"
                                     # item[variation_key] = None
                         #pdb.set_trace()
-                        sorted_months.pop(0)  
+                        if len(user_data) > 0:
+                            sorted_months.pop(0)  
+                            
                         sorted_months.insert(0,"Item")
                         sorted_months.insert(1,"Brand")
                         sorted_months.insert(2,"Category")
@@ -724,7 +726,10 @@ class Trends_API(View):
                                     # # If data for a month is missing, set variation to None
                                     # variation_key = f"variation_{prev_month_key}-{month}"
                                     # item[variation_key] = None
-                        sorted_months.pop(0)  
+                        if len(user_data) > 0:
+                            sorted_months.pop(0)  
+
+                        
                         sorted_months.insert(0,"Brand")
                         sorted_months.insert(1,"Category")
                         sorted_months.insert(2,"Protein_Type")    
