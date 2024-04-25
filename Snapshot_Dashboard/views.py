@@ -54,7 +54,8 @@ class SnapshotRegionAPI(View):
                 "Leeds":"Leeds",
                 "Manchester":"Manchester",
                 "London":"London",
-                "Bristol":"Bristol"
+                "Bristol":"Bristol",
+                "Item":"Product"
             }
 
             for filter_name, filter_values in filters.items():

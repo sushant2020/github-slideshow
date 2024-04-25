@@ -33,6 +33,11 @@ class AddOrganization(View):
             organization = data.get('organization', '')
             chains = data.get('chains','')
             country = data.get('country','')
+            add_chain = []
+            for i in chains:
+                if i not in add_chain:
+                    add_chain.append(i)
+                    
             with connection.cursor() as cursor:
     
 
