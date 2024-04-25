@@ -106,6 +106,35 @@ class SnapshotRegionExport(View):
                     order_by_clause = f'ORDER BY cast({filter_mappings[sort_column]} As float) {sort_type}'
                 else:
                     order_by_clause = f'ORDER BY {filter_mappings[sort_column]} {sort_type}'
+                with connection.cursor() as cursor:
+            
+                    query = f'''
+                        SELECT Product, Brand, Birmingham, Belfast, Cardiff, Glasgow, Liverpool, Leeds, Manchester, London, Bristol
+                        FROM SnapshotByRegionView sbrv 
+                        {where_clause}
+                        {order_by_clause}
+                       '''
+                
+                    cursor.execute(query,
+                        params)
+
+                    user_data = cursor.fetchall()
+                    keys = [
+                        "Product1", "Brand","Birmingham", "Belfast", "Cardiff", "Glasgow", "Liverpool", 
+                        "Leeds", "Manchester", "London", "Bristol"]
+
+                    result = []
+
+                    for row in user_data:
+                        obj = dict(zip(keys, row))
+                        result.append(obj)
+                    response_data = {
+                        "success": True,
+                        "data": result
+                    }
+
+                    
+                return JsonResponse(response_data, status=200)      
             elif dashboard_type == "Channel":
                 filter_mappings = {
                     "Timescale": "FormattedDate",
@@ -162,9 +191,30 @@ class SnapshotRegionExport(View):
                 
                 else:
                     order_by_clause = f'ORDER BY {filter_mappings[sort_column]} {sort_type}'
+                query = f'''
+                SELECT Product, Brand, "Dine In", "Delivery Average", "Delivery/DineIn", "UberEats", "Deliveroo", "JustEat"
+                FROM SnapshotByChannelView
+                '''
+                if where_conditions:
+                    where_clause = 'WHERE ' + ' AND '.join(where_conditions)
+                    query += ' WHERE ' + ' AND '.join(where_conditions)
+                if order_by_clause:
+                    query += ' ' + order_by_clause
+                with connection.cursor() as cursor:
+                    cursor.execute(query, params)
+                    user_data = cursor.fetchall()
+
+                # Serialize data
+                keys = ["Product", "Brand","Dine_In", "Delivery_Average", "DineIn_Delivery", "UberEats", "Deliveroo", "JustEat"]
+                result = [dict(zip(keys, row)) for row in user_data]
+                response_data = {
+                "success": True,
+                "data": result
+                }
+                return JsonResponse(response_data, status=200)
             else:
                 filter_mappings = {
-                    "Timescale": "FormattedDate",
+                "Timescale": "FormattedDate",
                 "Market_Segment": "Segments",
                 "Competitive_Set": "Brand",
                 "Channel": "ChannelName",
@@ -212,48 +262,30 @@ class SnapshotRegionExport(View):
                 else:
                     order_by_clause = f'ORDER BY {filter_mappings[sort_column]} {sort_type}'
 
-           
+                query = '''
+                SELECT Product, Brand, MinPrice, MaxPrice, AvgPrice, ModePrice, Variation 
+                FROM SnapshotByVariation
+                '''
+                if where_conditions:
+                    where_clause = 'WHERE ' + ' AND '.join(where_conditions)
+                    query += ' WHERE ' + ' AND '.join(where_conditions)
+                if order_by_clause:
+                    query += ' ' + order_by_clause
+                with connection.cursor() as cursor:
+                    cursor.execute(query, params)
+                    user_data = cursor.fetchall()
                 
-                if dashboard_type == "Region":
-                    query = f'''
-                        SELECT Product, Brand, Birmingham, Belfast, Cardiff, Glasgow, Liverpool, Leeds, Manchester, London, Bristol
-                        FROM SnapshotByRegionView sbrv 
-                        {where_clause}
-                        {order_by_clause} '''
-                elif dashboard_type == "Channel":
-                    query = '''
-                        SELECT Product, Brand, "Dine In", "Delivery Average", "Delivery/DineIn", "UberEats", "Deliveroo", "JustEat"
-                        FROM SnapshotByChannelView
-                        '''
-                    if where_conditions:
-                        query += ' WHERE ' + ' AND '.join(where_conditions)
-                    if order_by_clause:
-                        query += ' ' + order_by_clause
-                else:
-                    query = '''
-                        SELECT Product, Brand, MinPrice, MaxPrice, AvgPrice, ModePrice, Variation 
-                        FROM SnapshotByVariation
-                        '''
-                    if where_conditions:
-                        query += ' WHERE ' + ' AND '.join(where_conditions)
-                    if order_by_clause:
-                        query += ' ' + order_by_clause
+                keys = ["Product", "Brand", "MinPrice", "MaxPrice", "AvgPrice", "ModePrice", "Variation"]
 
-                cursor.execute(query, params)
-                user_data = cursor.fetchall()
-
-                result = []
-
-                
-
-                
-                keys = [desc[0] for desc in cursor.description]
-                result = [dict(zip(keys, row)) for row in user_data]
+            # Append "%" to Variation values and create response data
+                result = [dict(zip(keys, [*row[:-1], f"{row[-1]}%"])) for row in user_data]
                 response_data = {
-                    "success": True,
-                    "data": result
+                "success": True,
+                "data": result
                 }
+
                 return JsonResponse(response_data, status=200)
+                
         # except jwt.ExpiredSignatureError:
         #     # Token has expired
         #     return JsonResponse({'success': False, 'message': 'Token has expired'}, status=401)
@@ -262,6 +294,7 @@ class SnapshotRegionExport(View):
         #     # Invalid token
         #     return JsonResponse({'success': False, 'message': 'Invalid token'}, status=401)
         except Exception as e:
+            pdb.set_trace()
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
         
 
@@ -376,7 +409,7 @@ class TrendsExport(View):
                             product = row[0]
                             brand = row[1]
                             category = row[2]
-                            PriceSegment = (row[5])
+                            PriceSegment =  f'({row[5]})' 
                             Size = row[6]
                             price = row[3]
                             ProteinType = row[7]
@@ -489,7 +522,8 @@ class TrendsExport(View):
                             brand = row[1]
                             category = row[2]
                             price = row[3]
-                            PriceSegment = (row[5])
+                            PriceSegment = f'({row[5]})' 
+                          
                             Size = row[6]
                             ProteinType = row[7]
                             formatted_date = row[4]
@@ -614,7 +648,7 @@ class TrendsExport(View):
                             brand = row[1]
                             category = row[2]
                             price = row[3]
-                            PriceSegment = (row[5])
+                            PriceSegment = f'({row[5]})' 
                             Size = row[6]
                             formatted_date = row[4]
                             ProteinType = row[7]
