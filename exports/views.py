@@ -45,14 +45,67 @@ class SnapshotRegionExport(View):
             if dashboard_type == "Region":
                 filter_mappings = {
                     "Timescale": "FormattedDate",
-                    "Market_Segment": "Segments",
-                    "Competitive_Set": "Brand",
-                    "Category": "Category",
-                    "Protein_Type": "ProteinType",
-                    "Channel": "ChannelName",
-                    "Item" : "Product",
-                    "City":"City"
+                "Market_Segment": "Segments",
+                "Competitive_Set": "Brand",
+                "Category": "Category",
+                "Protein_Type": "ProteinType",
+                "Channel": "ChannelName",
+                "Product1" : "Product",
+                "City":"City",
+                "Product" : "Product",
+                "Brand":"Brand",
+                "Belfast":"Belfast",
+                "Birmingham":"Birmingham",
+                "Cardiff":"Cardiff",
+                "Glasgow":"Glasgow",
+                "Liverpool":"Liverpool",
+                "Leeds":"Leeds",
+                "Manchester":"Manchester",
+                "London":"London",
+                "Bristol":"Bristol",
+                "Item":"Product"
                 }
+                for filter_name, filter_values in filters.items():
+                    if filter_values:
+                        column_name = filter_mappings.get(filter_name)
+                        if column_name !="City":
+                            if column_name =="ProteinType" and filter_values==["All"]:
+                                pass
+                            else:
+                                if column_name:
+                                    where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
+                                    params.extend(filter_values)
+                    else:
+                        column_name = filter_mappings.get(filter_name)
+                        if filters["Competitive_Set"]==[] and column_name =="Brand":
+                                            with connection.cursor() as cursor:
+                                                cursor.execute(f'''
+                                                    SELECT mo.Chains
+                                                        FROM MetaOrganization mo
+                                                        JOIN user_management um ON mo.Organization = um.Organization 
+                                                        WHERE um.Email = '{email}'
+                                                    ''',
+                                                    )
+                                                user_data = cursor.fetchall()
+                                                user_data_list = [brand.strip() for brand in user_data[0][0].split(',')]
+                                            where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(user_data_list))])})")
+                                            params.extend(user_data_list)
+                        if filter_name != "City":
+                            if filter_name in filter_mappings:
+                                column_name = filter_mappings[filter_name]
+                                where_conditions.append(f"{column_name} IS NOT NULL")
+                        
+                where_clause = ''
+                if where_conditions:
+                    where_clause = 'WHERE ' + ' AND '.join(where_conditions)
+
+
+                order_by_clause = ''
+                if sort_column and sort_type and sort_column not in ["Product1","Brand","Product"]:
+
+                    order_by_clause = f'ORDER BY cast({filter_mappings[sort_column]} As float) {sort_type}'
+                else:
+                    order_by_clause = f'ORDER BY {filter_mappings[sort_column]} {sort_type}'
             elif dashboard_type == "Channel":
                 filter_mappings = {
                     "Timescale": "FormattedDate",
@@ -72,51 +125,94 @@ class SnapshotRegionExport(View):
                     "Brand":"Brand",
                     "Uber Eats":"UberEats"
                 }
+                where_conditions = []
+                params = []
+                for key, value in filters.items():
+                    if value:  # Check if the filter value is not empty
+                        column_name = filter_mappings.get(key)
+                        
+                        if column_name:
+                            if column_name =="ProteinType" and value==["All"]:
+                                pass
+                            else:
+                                where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in value])})")
+                                params.extend(value)
+                    else:
+                        column_name = filter_mappings.get(key)
+                        if filters["Competitive_Set"]==[] and column_name =="Brand" :
+                            with connection.cursor() as cursor:
+                                cursor.execute(f'''
+                                    SELECT mo.Chains
+                                        FROM MetaOrganization mo
+                                        JOIN user_management um ON mo.Organization = um.Organization 
+                                        WHERE um.Email = '{email}'
+                                    ''',
+                                    )
+                                user_data = cursor.fetchall()
+                                user_data_list = [brand.strip() for brand in user_data[0][0].split(',')]
+                            where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(user_data_list))])})")
+                            params.extend(user_data_list)
+                        
+
+
+                # Construct ORDER BY clause for sorting
+                order_by_clause = ''
+                if sort_column and sort_type and sort_column not in ["Item","Brand","Product1","Product"]:
+                    order_by_clause = f'ORDER BY cast("{filter_mappings[sort_column]}" As float) {sort_type}'
+                
+                else:
+                    order_by_clause = f'ORDER BY {filter_mappings[sort_column]} {sort_type}'
             else:
                 filter_mappings = {
                     "Timescale": "FormattedDate",
-                    "Market_Segment": "Segments",
-                    "Competitive_Set": "Brand",
-                    "Channel": "ChannelName",
-                    "Protein_Type": "ProteinType",
-                    "Category": "Category",
-                    "Item":"Product"
+                "Market_Segment": "Segments",
+                "Competitive_Set": "Brand",
+                "Channel": "ChannelName",
+                "Protein_Type": "ProteinType",
+                "Category": "Category",
+                "Item": "Product",
+                "Product1" : "Product",
+                "Product" : "Product",
+                "Brand":"Brand",
+                "MinPrice":"MinPrice",
+                "MaxPrice":"MaxPrice",
+                "AvgPrice":"AvgPrice",
+                "ModePrice":"ModePrice",
+                "Variation":"Variation"
                 }
-
-            for filter_name, filter_values in filters.items():
-                if filter_values:
-                    column_name = filter_mappings.get(filter_name)
-                    if column_name !="City":
+                where_conditions = []
+                params = []
+                for key, value in filters.items():
+                    if value:
+                        column_name = filter_mappings.get(key)
                         if column_name:
-                            where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
-                            params.extend(filter_values)
-                else:
-                    column_name = filter_mappings.get(filter_name)
-                    if filters["Competitive_Set"]==[] and column_name =="Brand":
+                            if column_name =="ProteinType" and value==["All"]:
+                                pass
+                            else:
+                                where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in value])})")
+                                params.extend(value)
+
+                    elif filters["Competitive_Set"] == [] and filter_mappings.get(key) == "Brand":
+                        # Retrieve user's chain brands if Competitive_Set filter is empty
                         with connection.cursor() as cursor:
                             cursor.execute(f'''
                                 SELECT mo.Chains
                                     FROM MetaOrganization mo
                                     JOIN user_management um ON mo.Organization = um.Organization 
                                     WHERE um.Email = '{email}'
-                                ''',
-                                )
+                            ''')
                             user_data = cursor.fetchall()
                             user_data_list = [brand.strip() for brand in user_data[0][0].split(',')]
-                        where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(user_data_list))])})")
+                        where_conditions.append(f"{filter_mappings.get(key)} IN ({', '.join(['%s' for _ in range(len(user_data_list))])})")
                         params.extend(user_data_list)
-                    if filter_name != "City":
-                        if filter_name in filter_mappings:
-                            column_name = filter_mappings[filter_name]
-                            where_conditions.append(f"{column_name} IS NOT NULL")
 
-            where_clause = ''
-            if where_conditions:
-                where_clause = 'WHERE ' + ' AND '.join(where_conditions)
+                order_by_clause = ''
+                if sort_column and sort_type and sort_column not in ["Item","Product1","Product","Brand"]:
+                    order_by_clause = f'ORDER BY cast("{filter_mappings[sort_column]}" As float) {sort_type}'
+                else:
+                    order_by_clause = f'ORDER BY {filter_mappings[sort_column]} {sort_type}'
 
-            with connection.cursor() as cursor:
-                if sort_column and sort_type:
-                    order_by_clause = f"ORDER BY {sort_column} {sort_type}"
+           
                 
                 if dashboard_type == "Region":
                     query = f'''
@@ -280,7 +376,7 @@ class TrendsExport(View):
                             product = row[0]
                             brand = row[1]
                             category = row[2]
-                            PriceSegment = row[5]
+                            PriceSegment = (row[5])
                             Size = row[6]
                             price = row[3]
                             ProteinType = row[7]
@@ -393,7 +489,7 @@ class TrendsExport(View):
                             brand = row[1]
                             category = row[2]
                             price = row[3]
-                            PriceSegment = row[5]
+                            PriceSegment = (row[5])
                             Size = row[6]
                             ProteinType = row[7]
                             formatted_date = row[4]
@@ -518,7 +614,7 @@ class TrendsExport(View):
                             brand = row[1]
                             category = row[2]
                             price = row[3]
-                            PriceSegment = row[5]
+                            PriceSegment = (row[5])
                             Size = row[6]
                             formatted_date = row[4]
                             ProteinType = row[7]
