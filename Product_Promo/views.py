@@ -123,6 +123,7 @@ class MV_Products(View):
 
                 for row in user_data:
                     obj = dict(zip(keys, row))
+                    obj['Prices'] = f"{obj['Prices']:.2f}"
                     result.append(obj)
                 response_data = {
                     "success": True,
