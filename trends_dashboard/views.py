@@ -275,7 +275,8 @@ class Trends_API(View):
                             formatted_date = row[4]
                             grouped_data[(product, brand, category,PriceSegment,Size,ProteinType)][formatted_date] = price
                             # Extract month from the formatted_date and add it to the set
-                            month = formatted_date[:6]  # Extract month-year string
+                            month = formatted_date[:6] 
+                             # Extract month-year string
                             all_months.add(month)
 
                         # Convert set of months to a sorted list
@@ -314,6 +315,7 @@ class Trends_API(View):
                                     # # If data for a month is missing, set variation to None
                                     # variation_key = f"variation_{prev_month_key}-{month}"
                                     # item[variation_key] = None
+                        #pdb.set_trace()
                         sorted_months.pop(0)  
                         sorted_months.insert(0,"Item")
                         sorted_months.insert(1,"Brand")
@@ -508,13 +510,13 @@ class Trends_API(View):
                                         where_conditions.append(f"(CONVERT(datetime, {column_name}, 5) >= %s AND CONVERT(datetime, {column_name}, 5) <= %s)")
                                         params.extend([start_date, end_date])
                                     else:
-                                        if filter_name == "Protein_Type" and filter_values == ["All"]:
-                                        #pass
-                                            where_conditions.append(f"{column_name} IN ('NotSet','Chicken','Beef','Plant-Based','Pork','Fish','Turkey','Sea Food','Duck','All','Lamb')")
+                                        # if filter_name == "Protein_Type" and filter_values == ["All"]:
+                                        # #pass
+                                        #     where_conditions.append(f"{column_name} IN ('NotSet','Chicken','Beef','Plant-Based','Pork','Fish','Turkey','Sea Food','Duck','All','Lamb')")
                                             
-                                        else:
-                                            where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
-                                            params.extend(filter_values)
+                                        # else:
+                                        where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
+                                        params.extend(filter_values)
                         else:
                             column_name = filter_mappings.get(filter_name)
                             if filters["Competitive_Set"]==[] and column_name =="BrandName":
@@ -571,7 +573,8 @@ class Trends_API(View):
                         sorted_months = sorted(all_months, key=extract_month)
                         sorted_months.insert(0,"Brand")
                         sorted_months.insert(1,"Category")
-                        sorted_months.insert(2,"Protein_Type")
+                        sorted_months.insert(2,"Protein_Type") 
+                        
                         total_count = len(grouped_data)
                         start_index = (page_number - 1) * records_per_page
                         end_index = min(start_index + records_per_page, total_count)
@@ -628,18 +631,18 @@ class Trends_API(View):
                                         where_conditions.append(f"((CONVERT(datetime, {column_name}, 5) >= %s AND CONVERT(datetime, {column_name}, 5) <= %s))")
                                         params.extend([from_date, to_date])
                                 else:
-                                    if filter_name == "Protein_Type" and filter_values == ["All"]:
-                                        #pass
-                                        where_conditions.append(f"{column_name} IN ('NotSet','Chicken','Beef','Plant-Based','Pork','Fish','Turkey','Sea Food','Duck','All','Lamb')")
+                                    # if filter_name == "Protein_Type" and filter_values == ["All"]:
+                                    #     #pass
+                                    #     where_conditions.append(f"{column_name} IN ('NotSet','Chicken','Beef','Plant-Based','Pork','Fish','Turkey','Sea Food','Duck','All','Lamb')")
                                         
-                                    else:
-                                        if filter_name == "Protein_Type" and filter_values == ["All"]:
-                                        #pass
-                                            where_conditions.append(f"{column_name} IN ('NotSet','Chicken','Beef','Plant-Based','Pork','Fish','Turkey','Sea Food','Duck','All','Lamb')")
+                                    # else:
+                                    #     if filter_name == "Protein_Type" and filter_values == ["All"]:
+                                    #     #pass
+                                    #         where_conditions.append(f"{column_name} IN ('NotSet','Chicken','Beef','Plant-Based','Pork','Fish','Turkey','Sea Food','Duck','All','Lamb')")
                                             
-                                        else:
-                                            where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
-                                            params.extend(filter_values)
+                                    #     else:
+                                        where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
+                                        params.extend(filter_values)
                         else:
                             column_name = filter_mappings.get(filter_name)
                             if filters["Competitive_Set"]==[] and column_name =="BrandName":
@@ -721,7 +724,7 @@ class Trends_API(View):
                                     # # If data for a month is missing, set variation to None
                                     # variation_key = f"variation_{prev_month_key}-{month}"
                                     # item[variation_key] = None
-                        
+                        sorted_months.pop(0)  
                         sorted_months.insert(0,"Brand")
                         sorted_months.insert(1,"Category")
                         sorted_months.insert(2,"Protein_Type")    
@@ -771,13 +774,13 @@ class Trends_API(View):
                                     where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
                                     params.extend(filter_values)
                                 else:
-                                    if filter_name == "Protein_Type" and filter_values == ["All"]:
-                                        #pass
-                                        where_conditions.append(f"{column_name} IN ('NotSet','Chicken','Beef','Plant-Based','Pork','Fish','Turkey','Sea Food','Duck','All','Lamb')")
+                                    # if filter_name == "Protein_Type" and filter_values == ["All"]:
+                                    #     #pass
+                                    #     where_conditions.append(f"{column_name} IN ('NotSet','Chicken','Beef','Plant-Based','Pork','Fish','Turkey','Sea Food','Duck','All','Lamb')")
                                         
-                                    else:
-                                        where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
-                                        params.extend(filter_values)
+                                    # else:
+                                    where_conditions.append(f"{column_name} IN ({', '.join(['%s' for _ in range(len(filter_values))])})")
+                                    params.extend(filter_values)
                         else:
                             column_name = filter_mappings.get(filter_name)
                             if filters["Competitive_Set"]==[] and column_name =="BrandName":
@@ -875,6 +878,7 @@ class Trends_API(View):
                         filter_sorted_months = sorted(set(months_between_dates).intersection(all_months), key=extract_month)
                         filter_sorted_months.insert(0, "Brand")
                         filter_sorted_months.insert(1, "Category") 
+                        filter_sorted_months.insert(2,"Protein_Type") 
                         response_data = {
                             "success": True,
                             "data": result,
