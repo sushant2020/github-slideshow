@@ -177,7 +177,7 @@ class SnapshotChannelAPI(View):
                 "Item":"Product",
                 "Brand":"Brand",
                 "Uber Eats":"UberEats",
-                "Product1" : "Product",
+                "Product1" : "Product"
             }
             data = json.loads(request.body)
             page_number = data.get('page_number', 1)
