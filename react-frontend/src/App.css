@@ -1,0 +1,35 @@
+
+.product {
+  text-align: left;
+}
+.product .ant-table-thead > tr > th {
+  color: #213A87;
+  font-weight: bold;
+  font-size: 20px;
+  text-align: left;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.3s ease;
+}
+
+.label {
+  color: #000000;
+}
+.label .ant-form-item-label > label {
+  position: relative;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -ms-flex-align: center;
+  align-items: center;
+  height: 32px;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 18px;
+}
+
+*{
+  font-family:sans-serif !important;
+}
+
+body{
+  font-family:sans-serif !important;
+}
