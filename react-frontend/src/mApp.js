@@ -1,5 +1,4 @@
 import React from 'react'
-import 'antd/dist/antd.css';
 import './App.css';
 import { Button, Table, Layout, Menu, Popover, Dropdown, Card, notification,Icon} from "antd";
 import { Drawer, List, NavBar, Button as MButton,Accordion, Icon as MIcon } from 'antd-mobile';
