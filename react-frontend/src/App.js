@@ -1,4 +1,5 @@
 import React from 'react'
+import 'antd/dist/antd.css';
 import './App.css';
 import { Button, Table, Layout, Menu, Popover, Dropdown, Card, notification} from "antd";
 import { Link, BrowserRouter as Router, withRouter, Switch} from 'react-router-dom';
