@@ -45,6 +45,6 @@ jobs:
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'product-portal'
+        app-name: 'product-portal-web'
         publish-profile: ${{ secrets.AZUREWEBAPPPUBLISHPROFILE }}
         package: ./laravel-backend
