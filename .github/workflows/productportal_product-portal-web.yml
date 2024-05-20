@@ -24,7 +24,6 @@ jobs:
         npm cache clean --force
         rm -rf node_modules package-lock.json
         npm install
-        npm install antd-mobile/dist/antd-mobile.css
         npm run build
       env:
         NODE_OPTIONS: --openssl-legacy-provider
