@@ -23,9 +23,10 @@ jobs:
         cd react-frontend
         npm cache clean --force
         rm -rf node_modules package-lock.json
-        npm update
         npm install
         npm run build
+      env:
+        NODE_OPTIONS: --openssl-legacy-provider
 
     - name: Move React build to Laravel public
       run: |
