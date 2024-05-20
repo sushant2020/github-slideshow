@@ -21,9 +21,7 @@ jobs:
     - name: Install Node.js dependencies
       run: |
         cd react-frontend
-        node -v
         npm cache clean --force
-        npm install antd-mobile --save
         npm install
         npm run build
 
