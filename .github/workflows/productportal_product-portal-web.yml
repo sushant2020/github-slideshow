@@ -21,7 +21,7 @@ jobs:
     - name: Install Node.js dependencies
       run: |
         cd react-frontend
-        npm cache clean --force
+        npm cache clean
         rm -rf node_modules package-lock.json
         npm install
         npm run build
