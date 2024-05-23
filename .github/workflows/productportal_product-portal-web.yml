@@ -18,19 +18,8 @@ jobs:
       with:
         node-version: '18.17.1'
 
-    - name: Install Node.js dependencies
-      run: |
-        cd react-frontend
-        npm cache clean --force
-        rm -rf node_modules package-lock.json
-        npm install
+   
 
-      env:
-        NODE_OPTIONS: --openssl-legacy-provider
-
-    - name: Move React build to Laravel public
-      run: |
-        cp -r react-frontend/build/* laravel-backend/public/
 
     - name: Set up PHP
       uses: shivammathur/setup-php@v2
@@ -39,12 +28,7 @@ jobs:
 
     - name: Install Composer dependencies
       run: |
-        cd laravel-backend
+        cd api
         composer install --no-dev --optimize-autoloader
 
-    - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'product-portal-web'
-        publish-profile: ${{ secrets.AZUREWEBAPPPUBLISHPROFILE }}
-        package: ./laravel-backend
+
