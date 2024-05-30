@@ -28,9 +28,9 @@ jobs:
       with:
         php-version: '7.4.33'
 
-    - name: Install Composer dependencies
-      run: |
-        composer install --no-dev --optimize-autoloader
+    #- name: Install Composer dependencies
+      #run: |
+        #composer install --no-dev --optimize-autoloader
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2

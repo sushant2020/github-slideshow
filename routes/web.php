@@ -13,9 +13,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
 
-Route::view('forgot_password', 'auth.reset_password')->name('password.reset');
+
+Route::get('/{any}', function () {
+    return File::get(public_path() . '/index.html');
+})->where('any', '.*');
+
+
