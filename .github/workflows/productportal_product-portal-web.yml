@@ -17,10 +17,12 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: '18.17.1'
+        
 
+    - name: Move React build to Laravel public
+      run: |
+        cp -r build/* public/
    
-
-
     - name: Set up PHP
       uses: shivammathur/setup-php@v2
       with:
@@ -28,7 +30,6 @@ jobs:
 
     - name: Install Composer dependencies
       run: |
-        cd api
         composer install --no-dev --optimize-autoloader
 
     - name: Deploy to Azure Web App
