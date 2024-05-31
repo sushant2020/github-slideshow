@@ -1,76 +1,43 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy PHP app to Azure Web App - sigmaproductportal
+name: Laravel and React Deployment s
 
 on:
   push:
     branches:
       - sigma-product-portal
-  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '18.17.1'
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18.17.1'
         
-      - name: Move React build to Laravel public
-        run: |
-          cp -r build/* laravel-backend/public/
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '7.4.33'
+    - name: Move React build to Laravel public
+      run: |
+        cp -r build/* laravel-backend/public/
+   
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4.33'
 
-      - name: Check if composer.json exists
-        id: check_files
-        uses: andstor/file-existence-action@v1
-        with:
-          files: 'composer.json'
+    - name: Install Composer dependencies
+      run: |
+        cd laravel-backend
+        composer install --no-dev --optimize-autoloader
 
-      - name: Install Composer dependencies
-        run: |
-         cd laravel-backend
-         composer install --no-dev --optimize-autoloader
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'sigmaproductportal'
+        publish-profile: ${{ secrets.AZUREWEBAPPPUBLISHPROFILEPP }}
+        package: ./laravel-backend
 
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
 
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
-        with:
-          name: php-app
-          path: release.zip
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: php-app
-
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
-
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v2
-        id: deploy-to-webapp
-        with:
-          app-name: 'sigmaproductportal'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C9AF6968F3A34EE4857BEEA33F91FE7A }}
-          package: ./laravel-backend
