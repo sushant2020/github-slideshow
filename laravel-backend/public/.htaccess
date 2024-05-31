@@ -1,4 +1,8 @@
 <IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
     RewriteEngine On
 
     # Handle Authorization Header
@@ -14,9 +18,4 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
-
-    # Serve React frontend for all other routes
-    RewriteCond %{REQUEST_URI} !^/api
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^ /index.html [L]
 </IfModule>
