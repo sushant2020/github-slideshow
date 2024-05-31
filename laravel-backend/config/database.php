@@ -53,22 +53,22 @@ return [
             'prefix' => '',
         ],
 		
-		'sqlsrv' => [
-			'driver' => 'sqlsrv',
-			'host'     => 'sigma-pc-server.database.windows.net', 
-			'database' => 'Sigma-Pricing',
-			'username' => 'sigma-pc-admin',
-			'password' => 'India@123',
-			'prefix'   => '',
-			'charset' => 'utf8',
-            'collation' => 'utf8_unicode_ci',
-            'strict' => false,
-                    'modes' => [
-             'STRICT_ALL_TABLES',
-                             'ERROR_FOR_DIVISION_BY_ZERO',
-                             'NO_ZERO_DATE',
-                             'NO_ZERO_IN_DATE',
-                             'NO_AUTO_CREATE_USER',
+        'sqlsrv' => [
+                'driver' => 'sqlsrv',
+               'host' => env('DB_HOST', '127.0.0.1'),
+                'database' => env('DB_DATABASE', 'forge'),
+                'username' => env('DB_USERNAME', 'forge'),
+                'password' => env('DB_PASSWORD', ''),
+                'prefix'   => '',
+                'charset' => 'utf8',
+                'collation' => 'utf8_unicode_ci',
+                'strict' => false,
+                'modes' => [
+                'STRICT_ALL_TABLES',
+                'ERROR_FOR_DIVISION_BY_ZERO',
+                'NO_ZERO_DATE',
+                'NO_ZERO_IN_DATE',
+                'NO_AUTO_CREATE_USER',
         ],
             ],
         'pgsql' => [

@@ -1,9 +1,9 @@
 server {
     #proxy_cache cache;
-	#proxy_cache_valid 200 1s;
+    #proxy_cache_valid 200 1s;
     listen 8080;
     listen [::]:8080;
-    root /home/site/wwwroot/laravel-backend/public;
+    root /home/site/wwwroot/public;
     index index.html index.php index.htm;
     server_name  example.com www.example.com; 
     port_in_redirect off;
@@ -11,7 +11,7 @@ server {
 
     location / {            
         #index index.html index.htm hostingstart.html;
-	    try_files $uri $uri/ /index.html;
+        try_files $uri $uri/ /index.html;
     }
     
     location /api {
@@ -21,7 +21,7 @@ server {
 
     # redirect server error pages to the static page /50x.html
     #
-    error_page   500 502 503 504  /index.php;
+    error_page   500 502 503 504  /50x.html;
     
     # Disable .git directory
     location ~ /\.git {
