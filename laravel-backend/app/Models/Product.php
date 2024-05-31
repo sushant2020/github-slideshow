@@ -4070,13 +4070,15 @@ WHERE
                                     'cp.aah_note',
                                     'cp.colorama_note',
                                     'cp.bestway_note',
-                                    'wl.as_of_date as AsOfDate'
+                                    'wl.as_of_date as AsOfDate',
+                                      'wl.created_at'
                             )->where('wl.list_type', '=', $group)
                             ->where('wl.is_deleted', 0)
                             ->where('wl.status', '=', 0)
 //                             ->where('wl.actioned', '=', 0)       
                             //->where('wl.as_of_date', $today)
                             ->orderBy($sortcolumn, $sorder)
+                            ->orderBy(DB::raw('CAST(wl.created_at AS TIME)'), 'asc')
                             ->limit($limit)->offset(($page - 1) * $limit)
                             ->get()->map(function ($products) {
                 $commentsStr = self::getBuyerComment($products->product_id);

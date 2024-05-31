@@ -31,7 +31,6 @@ class LoginController extends BaseController
         }
 
         $user = User::where('email', $request->email)->first();
-      
         if (!$user) {  // if email does not find in database
             return $this->sendErrorResponse('User Not Found.', 'The user account does not exist in the system', 203);
         }
@@ -40,7 +39,7 @@ class LoginController extends BaseController
             if ($user->is_deleted == 1) {
                 return $this->sendErrorResponse('User Archived.', 'The user account is disabled or archived', 202);
             }
- 
+
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
                 $user = Auth::user();
 

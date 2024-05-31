@@ -4891,8 +4891,8 @@ class ProductController extends BaseController
                 $name = 'India Review Team, ';
                 $subject = 'For India Review Team - Added products for review';
             } else if ($type == 4 && ($list_type == 1 || $list_type == 4 || $list_type == 3 || $list_type == 2 || $list_type == 6 || $list_type == 7)) {
-                 //$email = ['shrenal@sigmaplc.com','sushant@webdezign.co.uk','anand.m@sigmaplc.com'];
-                 $email = ['sushant@webdezign.co.uk'];
+                 $email = ['shrenal@sigmaplc.com','sushant@webdezign.co.uk','anand.m@sigmaplc.com'];
+                 //$email = ['sushant@webdezign.co.uk'];
                 $name = 'Pricer, ';
                 $txtmessage = 'Competitor Price review is done';
                  $subject = 'For Pricer - Competitor Price review is done';
@@ -4903,9 +4903,20 @@ class ProductController extends BaseController
 
             $data = ["name" => $name, "msg" => $txtmessage];
             if($list_type == 1 || $list_type == 3 || $list_type == 4 || $list_type == 7) {
-            $wsuccess = DB::table('product_watchlist')
-                    ->where(["list_type" => $list_type])
+                
+//            $wsuccess = DB::table('product_watchlist')
+//                    ->where(["list_type" => $list_type])
+//                    ->update(["status" => 1]);
+            
+            
+             $wsuccess = DB::table('product_watchlist as pw')
+                       ->join("dbo.competitor_prices as cp", "cp.watchlist_id", "=", "pw.watchlist_id")
+                    ->where(["pw.list_type" => $list_type, "pw.status" => 0])
                     ->update(["status" => 1]);
+            
+            
+            
+            
             }
             
              $success = DB::table('competitor_prices')
@@ -4915,8 +4926,8 @@ class ProductController extends BaseController
             if (!empty($success)) {
                 \Mail::send('emails.notify_reviewer', ['data' => $data], function ($message) use ($email, $txtmessage, $subject) {
                     $message->to($email)
-                           // ->cc('shrenal@sigmaplc.com', 'Shrenal Patel')
-                            ->cc('sushant@webdezign.co.uk', 'Sushant Chari')
+                            ->cc('shrenal@sigmaplc.com', 'Shrenal Patel')
+                            //->cc('sushant@webdezign.co.uk', 'Sushant Chari')
                             ->subject($subject);
                 });
                 return $this->sendResponse([], 'Notification mail sent successfully.');
