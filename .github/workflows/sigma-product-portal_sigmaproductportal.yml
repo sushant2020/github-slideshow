@@ -37,7 +37,7 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'sigmaproductportal'
-        publish-profile: ${{ secrets.AZUREWEBAPPPUBLISHPROFILE }}
+        publish-profile: ${{ secrets.AZUREWEBAPPPUBLISHPROFILEPP }}
         package: ./laravel-backend
 
 
