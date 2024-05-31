@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+use Exception;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -842,10 +843,11 @@ class ProductBackground extends Model
         $sendData = ["name" => $adminName, "email" => $adminEmail, "product" => $ac4Code, "spot" => $spotCode, "task" => $task, "assignedTo" => $assignedTo,
             "completedAt" => $completedAt, "completedBy" => $completedBy];
         $subject = "Task is completed for product " . $ac4Code . ' -' . $spotCode;
-      
+       
         \Mail::send('emails.task_completion_notification', ['data' => $sendData], function ($message) use ($assignedby, $subject) {
             $message->to($assignedby)->subject($subject);
         });
+        
     }
 
     /**

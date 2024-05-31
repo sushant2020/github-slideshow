@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\StudentController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -16,18 +17,10 @@ use App\Http\Controllers\GRNController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\ActivityLogController;
 
-/*
-  |--------------------------------------------------------------------------
-  | API Routes1
-  |--------------------------------------------------------------------------
-  |
-  | Here is where you can register API routes for your application. These
-  | routes are loaded by the RouteServiceProvider within a group which
-  | is assigned the "api" middleware group. Enjoy building your API!
-  |
- */
 
 
+
+Route::get('/students', [StudentController::class, 'index']);
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/reset-password-email', [ForgotPasswordController::class, 'forgot']);
 Route::post('/reset-password', [ForgotPasswordController::class, 'reset']);
@@ -269,3 +262,4 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/activity-logs/{logId}/mark-as-read', [ActivityLogController::class, 'markAsRead']);
     Route::post('/search-product-comment/{page}/{sortcolumn}/{sort}', [CommentController::class, 'filterComments']);
 });
+
